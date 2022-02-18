@@ -8,7 +8,7 @@ CryptImage (this name in temporary) is the repository of a python program able t
 The main branch is considered as the prod branch, ie with tested and reviewed code.
 
 
-All features must and will be developed and pushed via branch named after the contributor.
+All features must and will be developed and pushed via the developement branch
 
 ### Contributors
   - Victorine Cassé 
