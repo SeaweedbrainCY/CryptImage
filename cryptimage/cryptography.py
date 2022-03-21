@@ -10,11 +10,12 @@ import ecies
 
 class Cryptography(CryptImage):
     unique_key = ""
-    # Curve : NIST384p
-    sys_public_key = VerifyingKey.from_pem(b'-----BEGIN PUBLIC KEY-----\nMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE7Nwsv9YBllR9m2N4vMXSBr5iZYJ5NmAX\nXJqzCkvBE0d6lFZyjzflz4IHLGHldAABF4VhJMMdcmaufBe9YYW0jhqsX5p2rN0V\nCTQeXuWsYshNOcmJF27/Iesj4IdMvPBW\n-----END PUBLIC KEY-----\n')
-    sys_private_key = SigningKey.from_pem(b'-----BEGIN EC PRIVATE KEY-----\nMIGkAgEBBDDCgoVIMg+EEh7Qc3LaNJKJqLrb0PTJt68oCZ047Z5xpceuJbN8G170\nRiaiW0XorUOgBwYFK4EEACKhZANiAATs3Cy/1gGWVH2bY3i8xdIGvmJlgnk2YBdc\nmrMKS8ETR3qUVnKPN+XPggcsYeV0AAEXhWEkwx1yZq58F71hhbSOGqxfmnas3RUJ\nNB5e5axiyE05yYkXbv8h6yPgh0y88FY=\n-----END EC PRIVATE KEY-----\n')
+    # Curve : SECP256k1
+    sys_public_key = VerifyingKey.from_pem(b'-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE4BCAAs7qnPl6aQK9FrzyDOf63glR2JSS\nQqi6vuVLepKfq9Kzi5R3DlAiVMg0gUrQT2QUVHpuEi0Smb+j2xZoRA==\n-----END PUBLIC KEY-----\n')
+    sys_private_key = SigningKey.from_pem(b'-----BEGIN EC PRIVATE KEY-----\nMHQCAQEEIOwpju4BFTHMclLsT2Gm549ZRB4IsZUDrTFy9BjAzneOoAcGBSuBBAAK\noUQDQgAE4BCAAs7qnPl6aQK9FrzyDOf63glR2JSSQqi6vuVLepKfq9Kzi5R3DlAi\nVMg0gUrQT2QUVHpuEi0Smb+j2xZoRA==\n-----END EC PRIVATE KEY-----\n')
 
     hashed_password = ""
+
 
 
     def __init__(self, imageURL, password):
@@ -43,10 +44,11 @@ class Cryptography(CryptImage):
         Clear must be a utf8 string
     """
     def encrypt(self, clear):
-        public_key_hex = self.sys_public_key.hex()
+        public_key_hex = "0x" + self.sys_public_key.to_string().hex()
+        print("public = ", public_key_hex)
         clear_data = clear.encode()
         encrypted = ecies.encrypt(public_key_hex, clear_data)
-        return self.hex_to_base64(encrypted)
+        return (encrypted.hex())
         
 
     """
@@ -54,10 +56,11 @@ class Cryptography(CryptImage):
         cipher must be a base64 encode string
     """
     def decrypt(self, cipher):
-        public_key_hex = self.sys_public_key.hex()
-        clear_data = self.base64_to_hex(cipher)
-        decrypted = ecies.decrypt(public_key_hex, clear_data)
-        return self.hex_to_base64(decrypted)
+        private_key_hex = "0x" + self.sys_private_key.to_string().hex()
+        print("priv= " , private_key_hex)
+        cipher_data = bytes.fromhex(cipher)
+        decrypted = ecies.decrypt(private_key_hex, cipher_data)
+        return self.readablize(decrypted)
 
     """
         Sign with the sys private key
@@ -98,6 +101,13 @@ class Cryptography(CryptImage):
     """
     def base64_to_hex(self, encoded):
         return base64.b64decode(encoded)
+
+
+    def readablize(self, b: bytes) -> str:
+        try:
+            return b.decode()
+        except ValueError:
+            return b.hex()
 
 
 
