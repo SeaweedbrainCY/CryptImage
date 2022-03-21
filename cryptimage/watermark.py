@@ -1,11 +1,10 @@
 """
         Generate the watermark and embed it in the image which path is super.imageURL
 """
-from cryptimage.imageToVerify import ImageToVerify
-from cryptimage.imageToSign import ImageToSign
+from cryptimage.cryptImage import CryptImage
 
 
-class Watermark(ImageToVerify, ImageToSign) : 
+class Watermark(CryptImage) : 
     watermark_str: str # The string to embed in the image
 
     def __init__(self, watermark_str):

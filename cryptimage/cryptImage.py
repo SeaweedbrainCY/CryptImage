@@ -3,8 +3,6 @@ class CryptImage:
     password: str # Password given by the user
 
    
-    
-     
 
     def __init__(self,imageURL, password):
         if imageURL == "" or imageURL == None or password == "" or password == None :

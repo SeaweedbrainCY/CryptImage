@@ -1,10 +1,9 @@
 """
         Generate the string related to the watermark position to embed in the LSB of image
 """
-from cryptimage.imageToVerify import ImageToVerify
-from cryptimage.imageToSign import ImageToSign
+from cryptimage.cryptImage import CryptImage
 
-class LSB(ImageToVerify, ImageToSign):
+class LSB(CryptImage):
     lsb_str = "" # the string to embed in LSB 
 
     def __init__(self):

@@ -1,19 +1,17 @@
-from cryptimage.imageToVerify import ImageToVerify
-from cryptimage.imageToSign import ImageToSign
+from cryptimage.cryptImage import CryptImage
 
 """
     Perform all cryptography on images and data
 """
 
-class Cryptography(ImageToVerify, ImageToSign):
+class Cryptography(CryptImage):
     unique_key = ""
     sys_public_key = ""
     hashed_password = ""
 
 
-    def __init__(self):
-        self.hash_user_password()
-        self.generate_unique_key()
+    def __init__(self, imageURL, password):
+        super().__init__(imageURL, password)
         
 
     """
@@ -55,6 +53,8 @@ class Cryptography(ImageToVerify, ImageToSign):
 
     
 
+
+    
 
 
 
