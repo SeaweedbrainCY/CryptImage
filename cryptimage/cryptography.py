@@ -36,7 +36,8 @@ class Cryptography(CryptImage):
         Generate the unique key (per user) according to the crypto schema 
     """
     def generate_unique_key(self):
-        pass
+        encrypted_password = self.encrypt(self.hash_user_password)
+        self.unique_key = sha256(encrypted_password.encode()).hexdigest()
 
 
     """
@@ -45,7 +46,6 @@ class Cryptography(CryptImage):
     """
     def encrypt(self, clear):
         public_key_hex = "0x" + self.sys_public_key.to_string().hex()
-        print("public = ", public_key_hex)
         clear_data = clear.encode()
         encrypted = ecies.encrypt(public_key_hex, clear_data)
         return (encrypted.hex())
@@ -53,7 +53,7 @@ class Cryptography(CryptImage):
 
     """
         Decrypt with the unique key
-        cipher must be a base64 encode string
+        cipher must be a an hex encoded string
     """
     def decrypt(self, cipher):
         private_key_hex = "0x" + self.sys_private_key.to_string().hex()
