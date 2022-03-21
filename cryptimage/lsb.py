@@ -1,13 +1,13 @@
 """
         Generate the string related to the watermark position to embed in the LSB of image
 """
-from cryptimage.cryptImage import CryptImage
+from cryptimage.watermark import Watermark
+from PIL import Image
 import bitarray
 import base64
 
-class LSB(CryptImage):
-    lsb_str = "" # The string to embed in LSB
-
+class LSB(Watermark):
+    lsb_str = "Coucou Nathan t'es beau" # The string to embed in LSB
 
     
     """
@@ -18,11 +18,8 @@ class LSB(CryptImage):
         self.generateLSBstring()
         self.embedInLSB()
 
-    
-
-
     """
-        Generate the LSB string 
+        Genere le message en bit 
     """
     def generateLSBstring(self):
         encoded_message = base64.b64encode(self.lsb_str)
@@ -33,14 +30,19 @@ class LSB(CryptImage):
         bit_array = [int(i) for i in ba]
 
     """
-       Embed the LSB string in the PNG
+       Code le message dans la premiere colonne de pixel de l'image
     """
-    def embedInLSB(self, txt):
+    def embedInLSB(self):
+        #Importation de l'image a encoder
+        im = Image.open("original.jpg")
+        width, height = im.size
+        pixels = im.load
+
         if self.lsb_str == "":
             raise Exception("FATAL ERROR : There is no string to embed in LSB") 
 
         i = 0
-        for x in range(0, len(self.bitarray), 3):              #On parcourt la première ligne de pixel de longueur notre message
+        for x in range(0, len(self.bitarray), 3):              #On parcourt la premiere ligne de pixel de longueur notre message
             r,g,b = self.pixels[x,0]                        
 
             if i<len(self.bit_array):
@@ -56,4 +58,7 @@ class LSB(CryptImage):
         #On code nos octets dans l'image
         self.pixels[x,0] = (final_embed_r_bit, final_embed_g_bit, final_embed_b_bit)
 
-#Penser à passer à la ligne si on depasse la longueur de l'image par rapport à la longueur du message
+#Penser a passer a la ligne si on depasse la longueur de l'image par rapport a la longueur du 
+
+
+
