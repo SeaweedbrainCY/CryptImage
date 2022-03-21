@@ -48,7 +48,7 @@ class LSB(CryptImage):
                 r_lsb, g_lsb, b_lsb = int(r_bit[-1]), int(g_bit[-1]), int(b_bit[-1])           #On extrait les LSB de chaque code rgb
                 new_r_lsb, new_g_lsb, new_b_lsb = self.bit_array[i], self.bit_array[i+1], self.bit_array[i+2]       #On modifie chaque R G B avec le code voulu
                 
-                #On reconstitue nos octets pour chaque r g b
+                #On reconstitue nos octets pour chaque R G B
                 final_embed_r_bit = int(r_bit[:-1] + str(new_r_lsb), 2)
                 final_embed_g_bit = int(g_bit[:-1] + str(new_g_lsb), 2)
                 final_embed_b_bit = int(b_bit[:-1] + str(new_b_lsb), 2)
