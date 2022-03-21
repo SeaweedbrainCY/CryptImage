@@ -3,12 +3,14 @@ from hashlib import sha256
 from ecdsa import SigningKey, VerifyingKey
 from binascii import b2a_base64
 import base64
+import ecies 
 """
     Perform all cryptography on images and data
 """
 
 class Cryptography(CryptImage):
     unique_key = ""
+    # Curve : NIST384p
     sys_public_key = VerifyingKey.from_pem(b'-----BEGIN PUBLIC KEY-----\nMHYwEAYHKoZIzj0CAQYFK4EEACIDYgAE7Nwsv9YBllR9m2N4vMXSBr5iZYJ5NmAX\nXJqzCkvBE0d6lFZyjzflz4IHLGHldAABF4VhJMMdcmaufBe9YYW0jhqsX5p2rN0V\nCTQeXuWsYshNOcmJF27/Iesj4IdMvPBW\n-----END PUBLIC KEY-----\n')
     sys_private_key = SigningKey.from_pem(b'-----BEGIN EC PRIVATE KEY-----\nMIGkAgEBBDDCgoVIMg+EEh7Qc3LaNJKJqLrb0PTJt68oCZ047Z5xpceuJbN8G170\nRiaiW0XorUOgBwYFK4EEACKhZANiAATs3Cy/1gGWVH2bY3i8xdIGvmJlgnk2YBdc\nmrMKS8ETR3qUVnKPN+XPggcsYeV0AAEXhWEkwx1yZq58F71hhbSOGqxfmnas3RUJ\nNB5e5axiyE05yYkXbv8h6yPgh0y88FY=\n-----END EC PRIVATE KEY-----\n')
 
@@ -25,7 +27,7 @@ class Cryptography(CryptImage):
         Hash the user password
     """
     def hash_user_password(self):
-        self.hash_user_password = sha256(self.password.encode())
+        self.hash_user_password = sha256(self.password.encode()).hexdigest()
 
 
     """
@@ -38,16 +40,24 @@ class Cryptography(CryptImage):
 
     """
         Encrypt with the unique key
+        Clear must be a utf8 string
     """
     def encrypt(self, clear):
-        pass
+        public_key_hex = self.sys_public_key.hex()
+        clear_data = clear.encode()
+        encrypted = ecies.encrypt(public_key_hex, clear_data)
+        return self.hex_to_base64(encrypted)
         
 
     """
         Decrypt with the unique key
+        cipher must be a base64 encode string
     """
     def decrypt(self, cipher):
-        pass
+        public_key_hex = self.sys_public_key.hex()
+        clear_data = self.base64_to_hex(cipher)
+        decrypted = ecies.decrypt(public_key_hex, clear_data)
+        return self.hex_to_base64(decrypted)
 
     """
         Sign with the sys private key
