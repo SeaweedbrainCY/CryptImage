@@ -3,8 +3,8 @@ from cryptimage.lsb import LSB
 from cryptimage.watermark import Watermark
 
 class ImageToSign(Cryptography, Watermark, LSB):
-    imageURL: str # Current path of the image to verify
-    password: str # Password given by the user
+    imageURL= "" # Current path of the image to verify
+    password= "" # Password given by the user
     signedImagePath : str # current path of the signed image or signed-image to be
     watermark_position : str # the position of the watermark in the image
 
