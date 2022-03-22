@@ -61,12 +61,15 @@ class LSB(Watermark):
                 final_embed_g_bit = int(g_bit[:-1] + str(new_g_lsb), 2)
                 final_embed_b_bit = int(b_bit[:-1] + str(new_b_lsb), 2)
 
+
         #On code nos otets dans l'image
         #print (pixels[x,0])
         pixels[x,0] = (final_embed_r_bit, final_embed_g_bit, final_embed_b_bit)
         print(pixels[x,0])
         
         im.save("original.png")
+
+
 #Penser a passer a la ligne si on depasse la longueur de l'image par rapport a la longueur du 
 
 
