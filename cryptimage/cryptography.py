@@ -28,7 +28,7 @@ class Cryptography(CryptImage):
         Hash the user password
     """
     def hash_user_password(self):
-        self.hash_user_password = sha256(self.password.encode()).hexdigest()
+        self.hashed_password = sha256(self.password.encode()).hexdigest()
 
 
     """
