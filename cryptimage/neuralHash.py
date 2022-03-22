@@ -1,8 +1,7 @@
-from cryptimage.imageToVerify import ImageToVerify
-from cryptimage.imageToSign import ImageToSign
 
 
-class NeuralHash(ImageToSign, ImageToVerify):
+
+class NeuralHash():
     neural_hashed = ""
 
 

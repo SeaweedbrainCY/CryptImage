@@ -5,3 +5,8 @@ base64
 eciespy
 hypothesis
 pytest
+scipy
+json
+qrcode
+imageio
+bitarray
