@@ -67,7 +67,7 @@ class LSB(Watermark):
     """
     def embedInLSB(self):
         #Importation de l'image a encoder
-        im = Image.open("original.png")
+        im = Image.open("/Users/stchepinskynathan/Downloads/test.png")
         width, height = im.size
         pixels = im.load()
 
@@ -77,12 +77,16 @@ class LSB(Watermark):
         #Conversion en binaire du Str à encoder
         bin_lsb_str = ''.join(format(ord(x), 'b').zfill(8) for x in self.lsb_str)        
         i = 0
-
+        current_line = 0
         #On parcourt la premiere ligne de pixel de longueur notre message
         print(len(bin_lsb_str))
         for x in range(0, len(bin_lsb_str), 3):  
             #print(x)            
-            r,g,b,_=pixels[x,0]                        
+            if x> width: # on a atteint le bout de la ligne, on passe à la ligne suivante 
+                current_line += 1
+
+            x = x - int(current_line * width)
+            r,g,b,_=pixels[x,current_line]  
             if i<len(bin_lsb_str):
                 r_bit, g_bit, b_bit = bin(r), bin(g), bin(b)
 
