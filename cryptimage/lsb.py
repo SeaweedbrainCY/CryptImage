@@ -63,6 +63,8 @@ class LSB(Watermark):
         #On code nos octets dans l'image
         self.pixels[x,0] = (final_embed_r_bit, final_embed_g_bit, final_embed_b_bit)
 
+        
+
 #Penser a passer a la ligne si on depasse la longueur de l'image par rapport a la longueur du 
 
 
