@@ -52,7 +52,10 @@ class Watermark(CryptImage) :
         text_to_hash_binary = bin(int(hash_password_binary,2) | int(neuralHash_binary,2))[2:]
         text_to_hash_hexa = hex(int(text_to_hash_binary, 2))
         hashed_text = sha256(text_to_hash_hexa[2:].encode()).hexdigest()
-        self.watermark_str = hashed_text
+        hashed_text_signed = crypto.sign(hashed_text)
+        self.watermark_str = hashed_text + "," + hashed_text_signed
+        
+
 
     """
         Generate the image related to the watermark
@@ -63,6 +66,7 @@ class Watermark(CryptImage) :
         qr.make(fit=True)
         img = qr.make_image(fill_color="black",back_color="white").convert('RGB')
         img.save(self.qrcodePath)
+        self.StripQRCodeCorners()
 
     """
     Enlever les 3 carrés délimitant le QRcode
