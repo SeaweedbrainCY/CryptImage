@@ -1,7 +1,10 @@
 """
         Generate the watermark and embed it in the image which path is super.imageURL
 """
+from hashlib import sha256
 from cryptimage.cryptImage import CryptImage
+from cryptimage.cryptography import Cryptography
+from cryptimage.neuralHash import NeuralHash
 from scipy import misc
 import qrcode
 import numpy as np
@@ -40,7 +43,16 @@ class Watermark(CryptImage) :
         Generate the string to embed in the watermark
     """
     def generateWatermarkString(self):
-        pass
+        neuralHash = NeuralHash()
+        crypto = Cryptography(self.imageURL, self.password)
+
+        imageHash = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'#neuralHash.neuralHash() for test purpose
+        hash_password_binary = ''.join(format(ord(x), 'b').zfill(8) for x in crypto.hashed_password) # Encoding over 8 bits per char
+        neuralHash_binary = ''.join(format(ord(x), 'b').zfill(8) for x in imageHash) # Encoding over 8 bits per char
+        text_to_hash_binary = bin(int(hash_password_binary,2) | int(neuralHash_binary,2))[2:]
+        text_to_hash_hexa = hex(int(text_to_hash_binary, 2))
+        hashed_text = sha256(text_to_hash_hexa[2:].encode()).hexdigest()
+        self.watermark_str = hashed_text
 
     """
         Generate the image related to the watermark
