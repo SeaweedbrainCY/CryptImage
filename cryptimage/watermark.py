@@ -2,6 +2,7 @@
         Generate the watermark and embed it in the image which path is super.imageURL
 """
 from hashlib import sha256
+from os import lseek
 from cryptimage.cryptImage import CryptImage
 from cryptimage.cryptography import Cryptography
 from cryptimage.neuralHash import NeuralHash
@@ -15,9 +16,10 @@ from random import randint
 class Watermark(CryptImage) : 
     watermark_str = "" # The string to embed in the image
     finalImageURL = "" # Final path of the image signed
-    watermarkPosition = ""
+    watermarkPosition = "" # un dictionnaire de la forme : {'top_left' : (x,y), 'top_right' : (x,y)}
 
     qrcodePath = "qrcode_genere.png" # PRIVATE. Path to the tmp qr code
+    qrCodePixelsBytes = [] # Matrice stockant les pixels du QR code 1: blanc, 0: noir
 
     def __init__(self, imageURL, password):
         super().__init__(imageURL, password)
@@ -54,7 +56,8 @@ class Watermark(CryptImage) :
         hashed_text = sha256(text_to_hash_hexa[2:].encode()).hexdigest()
         hashed_text_signed = crypto.sign(hashed_text)
         self.watermark_str = hashed_text + "," + hashed_text_signed
-        
+
+
 
 
     """
@@ -66,12 +69,12 @@ class Watermark(CryptImage) :
         qr.make(fit=True)
         img = qr.make_image(fill_color="black",back_color="white").convert('RGB')
         img.save(self.qrcodePath)
-        self.StripQRCodeCorners()
+        self.stripQRCodeCorners()
 
     """
     Enlever les 3 carrés délimitant le QRcode
     """    
-    def StripQRCodeCorners(self):   
+    def stripQRCodeCorners(self):   
         qr = Image.open(self.qrcodePath)
         qr_code = np.array(qr) 
         transparent_area = (0,0,79,79) #carré en haut à gauche
@@ -116,9 +119,49 @@ class Watermark(CryptImage) :
     """
         Embed the generated watermark (as an image) in the image
     """
-    def emebedWatermark(self, position):
-        if position == None:
-            raise Exception("FATAL ERROR : No position to embed watermark")
-        pass
+    def emebedWatermark(self):
+
+        
+        (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
+        (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
+
+       
+        im = Image.open(self.finalImageURL)
+        pixelMap = im.load()
+        x=0
+        y=0
+        for i in range(top_left_x, top_right_x+1):
+            for j in range(top_left_y, top_right_y+3, 3):
+                pixel = pixelMap[i,j]
+                print("i=", i)
+                print("j=",j)
+                print("old = ", pixel)
+                (r,g,b, a) = pixel
+                (new_r, new_g, new_b) = (r,g,b)
+                if j < top_right_y + 1:
+                    print(self.qrCodePixelsBytes[x][y])
+                    new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
+                    print("new_r=",new_r )
+                if j+1 < top_right_y + 1:
+                    print(self.qrCodePixelsBytes[x][y+1])
+                    new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
+                    print("new_g=",new_g )
+                if j+2 < top_right_y + 1:
+                    new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
+                    print("new_r=",new_r )
+                pixelMap[i,j] = (new_r, new_g, new_b,a)
+                print("new = ", pixelMap[i,j])
+                y+=1
+            x+=1
+            y=0
+
+
+
+
+
+        
+
+
+        
 
 
