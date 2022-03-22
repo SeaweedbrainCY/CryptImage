@@ -2,7 +2,7 @@ from cryptimage.cryptography import Cryptography
 from cryptimage.lsb import LSB
 from cryptimage.watermark import Watermark
 
-class ImageToSign(Cryptography, Watermark, LSB):
+class ImageToSign(Cryptography, Watermark):
     imageURL= "" # Current path of the image to verify
     password= "" # Password given by the user
     signedImagePath : str # current path of the signed image or signed-image to be

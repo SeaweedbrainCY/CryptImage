@@ -12,15 +12,13 @@ from random import randint
 class Watermark(CryptImage) : 
     watermark_str = "" # The string to embed in the image
     finalImageURL = "" # Final path of the image signed
+    watermarkPosition = ""
 
     qrcodePath = "qrcode_genere.png" # PRIVATE. Path to the tmp qr code
 
-
-    def __init__(self, watermark_str):
-        if watermark_str == "" or watermark_str == None:
-            raise Exception("FATAL ERROR : No watermark to embed")
-        self.watermark_str = watermark_str
-        self.main()
+    def __init__(self, imageURL, password):
+        super().__init__(imageURL, password)
+        self.generateWatermarkString()
     
     """
         Manage the watermark creation 
@@ -33,10 +31,16 @@ class Watermark(CryptImage) :
         self.emebedWatermark(watermarkPosition)
         if newPath == None or watermarkPosition == None :
             raise Exception("FATAL ERROR : the signed-image to be or the watermark position are unknown")
-        super.signedImagePath = newPath
-        super.watermarkPosition = watermarkPosition 
+        self.finalImageURL = newPath
+        self.watermarkPosition = watermarkPosition 
         return True
 
+
+    """
+        Generate the string to embed in the watermark
+    """
+    def generateWatermarkString(self):
+        pass
 
     """
         Generate the image related to the watermark

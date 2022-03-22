@@ -1,13 +1,15 @@
 """
         Generate the string related to the watermark position to embed in the LSB of image
 """
+from cryptimage.aes import AESCipher
+from cryptimage.cryptography import Cryptography
 from cryptimage.watermark import Watermark
 from PIL import Image
 import bitarray
 import base64
-
+import json
 class LSB(Watermark):
-    lsb_str = "Coucou Nathan t'es beau" # The string to embed in LSB
+    lsb_str = "" # The string to embed in LSB
 
     
     """
@@ -19,15 +21,18 @@ class LSB(Watermark):
         self.embedInLSB()
 
     """
-        Genere le message en bit 
+        Genere le message chiffre a integrer dans les LSB
     """
     def generateLSBstring(self):
-        encoded_message = base64.b64encode(self.lsb_str)
+        print("test")
+        position = self.watermarkPosition
+        print(position)
+        position_str = json.dumps(position)
+        crypto = Cryptography(self.imageURL, self.password)
+        aes = AESCipher(crypto.unique_key)
+        self.lsb_str = aes.encrypt(position_str)
         
-        #Convertion du message en bit
-        ba = bitarray.bitarray()
-        ba.frombytes(encoded_message.encode('utf-8'))
-        bit_array = [int(i) for i in ba]
+
 
     """
        Code le message dans la premiere colonne de pixel de l'image

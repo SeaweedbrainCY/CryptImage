@@ -41,10 +41,10 @@ class Cryptography(CryptImage):
 
 
     """
-        Encrypt with the unique key
+        Encrypt with the public key
         Clear must be a utf8 string
     """
-    def encrypt(self, clear):
+    def sys_encrypt(self, clear):
         public_key_hex = "0x" + self.sys_public_key.to_string().hex()
         clear_data = clear.encode()
         encrypted = ecies.encrypt(public_key_hex, clear_data)
@@ -52,15 +52,17 @@ class Cryptography(CryptImage):
         
 
     """
-        Decrypt with the unique key
+        Decrypt with the private key
         cipher must be a an hex encoded string
     """
-    def decrypt(self, cipher):
+    def sys_decrypt(self, cipher):
         private_key_hex = "0x" + self.sys_private_key.to_string().hex()
         print("priv= " , private_key_hex)
         cipher_data = bytes.fromhex(cipher)
         decrypted = ecies.decrypt(private_key_hex, cipher_data)
         return self.readablize(decrypted)
+
+    
 
     """
         Sign with the sys private key
