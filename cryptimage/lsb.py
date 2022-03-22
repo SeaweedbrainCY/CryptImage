@@ -30,10 +30,34 @@ class LSB(Watermark):
         crypto = Cryptography(self.imageURL, self.password)
         aes = AESCipher(crypto.unique_key)
         encrypted = aes.encrypt(position_str).decode()
-
+        
         signed = crypto.sign(encrypted)
-        self.lsb_str = encrypted + '&' + signed + '&'
+        self.lsb_str = encrypted + "&" + signed + "&"
+        
 
+    """
+        decrypt the LSB string to retrieve the watermark position
+        raise an error if the signature isn't valid
+    """
+    def decryptLSBString(self):
+        crypto = Cryptography(self.imageURL, self.password)
+        aes = AESCipher(crypto.unique_key)
+
+
+        splited = self.lsb_str.split('&')
+        if len(splited) != 3 :
+            raise Exception("FATAL ERROR : Embedded information are corrupt")
+        encrypted = splited[0]
+        signed = splited[1]
+        if not crypto.verify_signature(signed, encrypted):
+            raise Exception("FATAL ERROR : Embedded information cannot be verified")
+        try:
+            decrypted = aes.decrypt(encrypted)
+            watermarkPosition  = json.load(decrypted)
+        except:
+            raise Exception("**CRITIC** FATAL ERROR : Embedded information are corrupted but verified")
+
+        self.watermarkPosition  = watermarkPosition
 
         
 

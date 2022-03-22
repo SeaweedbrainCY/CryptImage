@@ -183,6 +183,42 @@ class Watermark(CryptImage) :
             y=0
         self.qrCodePixelsBytes = qrCodeExtracted
       
+
+        """
+            Test if the motif is correct according to the user 
+            Return True is ok, False if not
+        """
+    def checkWatermark(self):
+        neuralHash = NeuralHash()
+        crypto = Cryptography(self.imageURL, self.password)
+
+        imageHash =     '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08   '#neuralHash.neuralHash() for test purpose
+        hash_password_binary = ''.join(format(ord(x), 'b').zfill(8) for     x in crypto.hashed_password) # Encoding over 8 bits per char
+        neuralHash_binary = ''.join(format(ord(x), 'b').zfill(8) for x  in imageHash) # Encoding over 8 bits per char
+        text_to_hash_binary = bin(int(hash_password_binary,2) | int (neuralHash_binary,2))[2:]
+        text_to_hash_hexa = hex(int(text_to_hash_binary, 2))
+        hashed_text = sha256(text_to_hash_hexa[2:].encode()).hexdigest()
+            
+        splited = self.watermark_str.split(',')
+        if len(splited) != 2:
+            print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
+            return False
+
+        extractedHash = splited[0]
+        extractedSignature = splited[1]
+
+            # First step : Verify the signature 
+        if not crypto.verify_signature(extractedSignature, extractedHash):
+            print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
+            return False 
+        if extractedHash != hashed_text :
+            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
+            return False 
+        else : 
+            return True 
+
+            
+            
         
 
 
