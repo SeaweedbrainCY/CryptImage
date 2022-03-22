@@ -121,7 +121,9 @@ class Watermark(CryptImage) :
     """
     def emebedWatermark(self):
 
-        
+        self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
+        self.finalImageURL = "/Users/stchepinskynathan/Downloads/test.png"
+        self.qrCodePixelsBytes = [[0,0], [1,1]]
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
 
@@ -133,32 +135,56 @@ class Watermark(CryptImage) :
         for i in range(top_left_x, top_right_x+1):
             for j in range(top_left_y, top_right_y+3, 3):
                 pixel = pixelMap[i,j]
-                print("i=", i)
-                print("j=",j)
-                print("old = ", pixel)
                 (r,g,b, a) = pixel
                 (new_r, new_g, new_b) = (r,g,b)
                 if j < top_right_y + 1:
-                    print(self.qrCodePixelsBytes[x][y])
                     new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
-                    print("new_r=",new_r )
                 if j+1 < top_right_y + 1:
-                    print(self.qrCodePixelsBytes[x][y+1])
                     new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
-                    print("new_g=",new_g )
                 if j+2 < top_right_y + 1:
                     new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
-                    print("new_r=",new_r )
                 pixelMap[i,j] = (new_r, new_g, new_b,a)
-                print("new = ", pixelMap[i,j])
                 y+=1
             x+=1
             y=0
+        im.save(self.finalImageURL)
 
 
 
 
 
+    """
+        Extract the generated watermark (as an image) from the image
+    """
+    def extractWatermark(self):
+        self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
+        self.imageURL = "/Users/stchepinskynathan/Downloads/test.png"
+        (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
+        (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
+
+
+        im = Image.open(self.imageURL)
+        pixelMap = im.load()
+        x=0
+        y=0
+        qrCodeExtracted = []
+        for i in range(top_left_x, top_right_x+1):
+            tmp = [] 
+            for j in range(top_left_y, top_right_y+3, 3):
+                pixel = pixelMap[i,j]
+                (r,g,b, a) = pixel
+                if j < top_right_y + 1:
+                    tmp.append(str(bin(r)[-1]))
+                if j+1 < top_right_y + 1:
+                    tmp.append(str(bin(g)[-1]))
+                if j+2 < top_right_y + 1:
+                    tmp.append(str(bin(b)[-1]))
+                y+=1
+            qrCodeExtracted.append(tmp)
+            x+=1
+            y=0
+        self.qrCodePixelsBytes = qrCodeExtracted
+        print(qrCodeExtracted)
         
 
 
