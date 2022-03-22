@@ -157,8 +157,6 @@ class Watermark(CryptImage) :
         Extract the generated watermark (as an image) from the image
     """
     def extractWatermark(self):
-        self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
-        self.imageURL = "/Users/stchepinskynathan/Downloads/test.png"
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
 
@@ -184,7 +182,7 @@ class Watermark(CryptImage) :
             x+=1
             y=0
         self.qrCodePixelsBytes = qrCodeExtracted
-        print(qrCodeExtracted)
+      
         
 
 
