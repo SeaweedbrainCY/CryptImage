@@ -18,13 +18,22 @@ class LSB(Watermark):
         Manage the LSB creation and embedding
         Return True or  raise an exception if fail
     """
-    def mainLSB(self):
+    def mainLSBSignature(self):
         print("[*] Génération des données cachées ...", end=' ')
         self.generateLSBstring()
         print("Ok")
 
         print("[*] Intégration des données cachées dans l'image ...", end=' ')
         self.embedInLSB()
+        print("Ok")
+
+    def mainLSBVerify(self):
+        print("[*] Extraction des données cachées dans l'image ...",  end=' ')
+        self.decodeLSB()
+        print("Ok")
+        
+        print("[*] Déchiffrement des données cachées ...",  end=' ')
+        self.decryptLSBString()
         print("Ok")
 
     """
@@ -59,9 +68,12 @@ class LSB(Watermark):
             raise Exception("FATAL ERROR : Embedded information cannot be verified")
         try:
             decrypted = aes.decrypt(encrypted)
-            watermarkPosition  = json.load(decrypted)
         except:
             raise Exception("**CRITIC** FATAL ERROR : Embedded information are corrupted but verified")
+        try :
+            watermarkPosition  = json.loads(decrypted)
+        except :
+            raise Exception("**CRITIC** FATAL ERROR : Embedded information are corrupted but decrypted")
 
         self.watermarkPosition  = watermarkPosition
 
