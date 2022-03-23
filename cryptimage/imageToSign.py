@@ -15,8 +15,8 @@ class ImageToSign(Cryptography, LSB):
         self.main()
 
     def main(self):
-        if self.mainWatermark() :
-            self.mainLSB()
+        if self.mainWatermarkSignature() :
+            self.mainLSBSignature()
         else :
             raise Exception("FATAL ERROR : An error occured with generating the watermark")
         

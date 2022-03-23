@@ -1,7 +1,7 @@
 from cryptimage.cryptography import Cryptography
-from cryptimage.watermark import Watermark
+from cryptimage.lsb import LSB
 
-class ImageToVerify(Cryptography, Watermark):
+class ImageToVerify(Cryptography, LSB):
     imageURL: str # Current path of the image to verify
     password: str # Password given by the user
 
@@ -9,4 +9,12 @@ class ImageToVerify(Cryptography, Watermark):
         super().__init__(imageURL, password)
         self.imageURL = imageURL
         self.password = password
+        self.main()
 
+
+    def main(self):
+        self.mainLSBVerify()
+        if self.mainWatermarkVerify() :
+            print("[*]\n[*] Verification de propriété valide")
+        else:
+            print("[*]\n[*] Verification de propriété invalide. UTILISATION DE L'IMAGE INTERDITE")
