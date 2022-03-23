@@ -104,7 +104,18 @@ class Watermark(CryptImage) :
     """
 
     def convertToPNG(self):
-        pass
+        img = Image.open(self.imageURL)
+        try :
+           if img.format!="PNG":
+               splited = self.imageURL.split('.')
+               if len(splited) == 1 or len(splited) == 2:
+                   self.imageURL = splited[0] + ".png"
+               else :
+                   raise Exception("FATAL ERROR : The path to the file isn't correct") 
+
+               img.save(self.imageURL)
+        except :
+           raise Exception("FATAL ERROR : The file isn't an image") 
 
     """
         Generate a random position in the image where the watermark CAN be embedded
