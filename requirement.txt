@@ -1,0 +1,8 @@
+ecdsa
+eciespy
+hypothesis
+pytest
+scipy
+qrcode
+imageio
+bitarray
