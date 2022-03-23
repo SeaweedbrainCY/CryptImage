@@ -30,7 +30,7 @@ class Watermark(CryptImage) :
         Manage the watermark creation 
         Return True or  raise an exception if fail
     """
-    def mainWatermark(self):
+    def mainWatermarkSignature(self):
         self.imageCopy() 
         print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
 
@@ -51,6 +51,39 @@ class Watermark(CryptImage) :
         print("Ok")
 
         return True
+
+    """
+        Extraction the watermark creation 
+        Return True or  raise an exception if fail
+    """
+    def mainWatermarkVerify(self):
+        self.imageCopy() 
+        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+
+        print("[*] Extraction des données constituant le motif ... ", end=' ')
+        self.extractWatermark()
+        print("Ok")
+
+        print("[*] Reconstruction du motif ... ", end=' ')
+        self.reconstructQRCode()
+        self.refaire_3_blocs()
+        print("Ok")
+
+        print("[*] Extraction des données cotenus dans le motif ...", end=' ')
+        self.readQRcode()
+        print("Ok")
+
+        print("[*] Verification de la preuve de propriété ...", end=' ')
+        isOk =  self.checkWatermark()
+        if not isOk:
+            print("Ok")
+
+        return isOk
+
+        
+
+
+   
 
 
     """
@@ -255,7 +288,10 @@ class Watermark(CryptImage) :
             tmp = [] 
             for j in range(top_left_y, top_right_y+3, 3):
                 pixel = pixelMap[i,j]
-                (r,g,b, a) = pixel
+                if im.mode == "RGB":
+                    (r,g,b) = pixel
+                else:
+                    (r,g,b, a) = pixel
                 if j < top_right_y + 1:
                     tmp.append(str(bin(r)[-1]))
                 if j+1 < top_right_y + 1:
@@ -286,7 +322,7 @@ class Watermark(CryptImage) :
             
         splited = self.watermark_str.split(',')
         if len(splited) != 2:
-            print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
+            print("\n\n[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner\n\n")
             return False
 
         extractedHash = splited[0]
@@ -296,18 +332,21 @@ class Watermark(CryptImage) :
         if not crypto.verify_signature(extractedSignature, extractedHash):
             print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
             return False 
-        if extractedHash != hashed_text :
-            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
-            return False 
-        else : 
+        print(extractedHash)
+        print(hashed_text)
+        if extractedHash == hashed_text :
             return True 
+        else : 
+            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
+            return False
+            
 
             
     """
     Reconstruit le qr code à partir de la matrice
     """
     def reconstructQRCode(self):
-        print("test")
+        #print("test")
         code = Image.new(mode="RGBA", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)))
         code.show()
 
@@ -323,6 +362,13 @@ class Watermark(CryptImage) :
         #        else :
         #             pixels[x,y] = 0,0,0,1
         #code.save("new.png")
+
+
+    """
+    Read the qr code data 
+    """
+    def readQRcode(self):
+        pass
 
 
 
