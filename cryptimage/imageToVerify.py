@@ -1,5 +1,4 @@
 from cryptimage.cryptography import Cryptography
-from cryptimage.lsb import LSB
 from cryptimage.watermark import Watermark
 
 class ImageToVerify(Cryptography, Watermark):
