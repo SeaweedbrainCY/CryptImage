@@ -116,6 +116,36 @@ class Watermark(CryptImage) :
         j_qr = random.randint(qr.shape,M.shape-qr.shape-1) #ordonnée du QR code
 
 
+    """ 
+    Generate the tab associated to a QR code
+    """
+
+    def generateQrCodeMatrice(self):
+        print("start")
+        im = Image.open(self.qrcodePath)
+        pixels = im.load()
+        width, height = im.size    
+        matrix = []
+
+        for x in range(width):
+            tmp = []
+            for y in range(height):
+ 
+                (r,g,b, a) = pixels[x,y]
+                if a == 0:
+                    tmp.append(-1)
+                    
+                elif (r,g,b) == (255,255,255):
+                    tmp.append(1)
+                else :
+                    tmp.append(0)
+            matrix += tmp
+        self.qrCodePixelsBytes = matrix
+        print("end")
+        
+        
+        
+        
     """
         Embed the generated watermark (as an image) in the image
     """
@@ -218,7 +248,29 @@ class Watermark(CryptImage) :
             return True 
 
             
-            
+    """
+    Reconstruit le qr code à partir de la matrice
+    """
+    def reconstructQRCode(self):
+        print("test")
+        code = Image.new(mode="RGBA", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)))
+        code.show()
+
+        #width, height = code.size
+        #pixels = code.load()
+
+        #for x in range(width):
+        #    for y in range(height):
+        #        if self.qrCodePixelsBytes[x][y] == -1:
+        #            pixels[x,y] = 0,0,0,0
+        #        elif self.qrCodePixelsBytes[x][y] == 0:
+        #             pixels[x,y] = 255,255,255,1
+        #        else :
+        #             pixels[x,y] = 0,0,0,1
+        #code.save("new.png")
+
+
+
         
 
 
