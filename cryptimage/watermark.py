@@ -22,22 +22,34 @@ class Watermark(CryptImage) :
     qrCodePixelsBytes = [] # Matrice stockant les pixels du QR code 1: blanc, 0: noir
 
     def __init__(self, imageURL, password):
+        print("watermark")
         super().__init__(imageURL, password)
-        self.generateWatermarkString()
+        
     
     """
         Manage the watermark creation 
         Return True or  raise an exception if fail
     """
-    def main(self):
-        newPath = self.imageCopy() 
-        watermarkPosition = self.generateRandomPosition()
+    def mainWatermark(self):
+        self.imageCopy() 
+        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+
+        print("[*] Génération de la signature  ...", end=' ')
+        self.generateWatermarkString()
+        print("Ok")
+
+        print("[*] Génération du motif ...", end=' ')
         self.generateWatermarkImage()
-        self.emebedWatermark(watermarkPosition)
-        if newPath == None or watermarkPosition == None :
-            raise Exception("FATAL ERROR : the signed-image to be or the watermark position are unknown")
-        self.finalImageURL = newPath
-        self.watermarkPosition = watermarkPosition 
+        print("Ok")
+
+        print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
+        self.watermarkPosition = self.generateRandomPosition() 
+        print("Ok")
+
+        print("[*] Intégration du motif dans l'image ...", end=' ')
+        self.emebedWatermark()
+        print("Ok")
+
         return True
 
 
@@ -95,7 +107,10 @@ class Watermark(CryptImage) :
         Copy and create the signed-image to be in the right location
     """
     def imageCopy(self):
-        pass
+        self.finalImageURL = "final.png"
+        im = Image.open(self.imageURL)
+        im.save(self.finalImageURL)
+        
 
 
     """
@@ -110,10 +125,11 @@ class Watermark(CryptImage) :
         Generate a random position in the image where the watermark CAN be embedded
     """
     def generateRandomPosition(self):
-        M = misc.imread(self.imageURL)
-        M.shape
-        i_qr = random.randint(qr.shape,M.shape-qr.shape-1) #abscisse du QR code
-        j_qr = random.randint(qr.shape,M.shape-qr.shape-1) #ordonnée du QR code
+        im = Image.open(self.imageURL)
+        width, height = im.size
+        x_qr = randint(1,width - len(self.qrCodePixelsBytes)-1) #abscisse du QR code
+        y_qr = randint(3,height - len(self.qrCodePixelsBytes)-1)  #ordonnée du QR code
+        self.watermarkPosition = {"top_left":(x_qr, y_qr), "top_right":(x_qr + len(self.qrCodePixelsBytes), y_qr + len(self.qrCodePixelsBytes))}
 
 
     """ 
@@ -121,7 +137,6 @@ class Watermark(CryptImage) :
     """
 
     def generateQrCodeMatrice(self):
-        print("start")
         im = Image.open(self.qrcodePath)
         pixels = im.load()
         width, height = im.size    
@@ -139,9 +154,8 @@ class Watermark(CryptImage) :
                     tmp.append(1)
                 else :
                     tmp.append(0)
-            matrix += tmp
+            matrix.append(tmp)
         self.qrCodePixelsBytes = matrix
-        print("end")
         
         
         
@@ -152,7 +166,6 @@ class Watermark(CryptImage) :
     def emebedWatermark(self):
 
         self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
-        self.finalImageURL = "/Users/stchepinskynathan/Downloads/test.png"
         self.qrCodePixelsBytes = [[0,0], [1,1]]
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
@@ -165,7 +178,10 @@ class Watermark(CryptImage) :
         for i in range(top_left_x, top_right_x+1):
             for j in range(top_left_y, top_right_y+3, 3):
                 pixel = pixelMap[i,j]
-                (r,g,b, a) = pixel
+                if im.mode == "RGB":
+                    (r,g,b) = pixel
+                else :
+                    (r,g,b, a) = pixel
                 (new_r, new_g, new_b) = (r,g,b)
                 if j < top_right_y + 1:
                     new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
@@ -173,7 +189,10 @@ class Watermark(CryptImage) :
                     new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
                 if j+2 < top_right_y + 1:
                     new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
-                pixelMap[i,j] = (new_r, new_g, new_b,a)
+                if im.mode == "RGB":
+                    pixelMap[i,j] = (new_r, new_g, new_b)
+                else :
+                    pixelMap[i,j] = (new_r, new_g, new_b,a)
                 y+=1
             x+=1
             y=0
