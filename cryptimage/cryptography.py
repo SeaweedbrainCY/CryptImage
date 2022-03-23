@@ -8,7 +8,9 @@ import ecies
     Perform all cryptography on images and data
 """
 
-class Cryptography(CryptImage):
+class Cryptography():
+    imageURL = ""
+    password = ""
     unique_key = ""
     # Curve : SECP256k1
     sys_public_key = VerifyingKey.from_pem(b'-----BEGIN PUBLIC KEY-----\nMFYwEAYHKoZIzj0CAQYFK4EEAAoDQgAE4BCAAs7qnPl6aQK9FrzyDOf63glR2JSS\nQqi6vuVLepKfq9Kzi5R3DlAiVMg0gUrQT2QUVHpuEi0Smb+j2xZoRA==\n-----END PUBLIC KEY-----\n')
@@ -19,7 +21,8 @@ class Cryptography(CryptImage):
 
 
     def __init__(self, imageURL, password):
-        super().__init__(imageURL, password)
+        self.imageURL = imageURL
+        self.password = password
         self.hash_user_password()
         
 
