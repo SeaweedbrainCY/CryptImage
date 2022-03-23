@@ -18,16 +18,20 @@ class LSB(Watermark):
         Manage the LSB creation and embedding
         Return True or  raise an exception if fail
     """
-    def main(self):
+    def mainLSB(self):
+        print("[*] Génération des données cachées ...", end=' ')
         self.generateLSBstring()
+        print("Ok")
+
+        print("[*] Intégration des données cachées dans l'image ...", end=' ')
         self.embedInLSB()
+        print("Ok")
 
     """
         Genere le message chiffre a integrer dans les LSB
     """
     def generateLSBstring(self):
         position = self.watermarkPosition
-        print(position)
         position_str = json.dumps(position)
         crypto = Cryptography(self.imageURL, self.password)
         aes = AESCipher(crypto.unique_key)
@@ -76,20 +80,18 @@ class LSB(Watermark):
             raise Exception("FATAL ERROR : There is no string to embed in LSB") 
 
         #Conversion en binaire du Str à encoder
-        bin_lsb_str = ''.join(format(ord(x), 'b').zfill(8) for x in self.lsb_str)   
-        print(' '.join(format(ord(x), 'b').zfill(8) for x in self.lsb_str))     
+        bin_lsb_str = ''.join(format(ord(x), 'b').zfill(8) for x in self.lsb_str)       
         i = 0
         x=0
         y = 0
         #On parcourt la premiere ligne de pixel de longueur notre message
-        print(len(bin_lsb_str))
-        print(self.lsb_str)
+        #print(len(bin_lsb_str))
+        #print(self.lsb_str)
         for i in range(0, len(bin_lsb_str), 3):  
             #print(x)            
             if x> width: # on a atteint le bout de la ligne, on passe à la ligne suivante 
                 y += 1
                 x=0
-                print("SAUT DE LIGNE")
             if im.mode == "RGB":
                 r,g,b=pixels[x,y]
             else :
@@ -115,8 +117,8 @@ class LSB(Watermark):
                 final_embed_b_bit = int(b_bit[:-1] + str(bin_lsb_str[i+2]), 2)
 
             #print("initial = ", r_bit, g_bit, b_bit, end=' ')
-            if i+2 < len(bin_lsb_str):
-                print(bin( final_embed_r_bit ),bin(final_embed_g_bit) , bin(final_embed_b_bit) , end=' ')
+            #if i+2 < len(bin_lsb_str):
+                #print(bin( final_embed_r_bit ),bin(final_embed_g_bit) , bin(final_embed_b_bit) , end=' ')
 
 
             #On code nos octets dans l'image
@@ -128,7 +130,7 @@ class LSB(Watermark):
                 
             x+=1
             #print(pixels[x,y], end=' ') 
-        print(self.lsb_str)
+       #print(self.lsb_str)
        
         im.save(self.finalImageURL)
         #print(self.md5f("original.png"))
@@ -160,7 +162,7 @@ class LSB(Watermark):
             r_bit = str(bin(r))[2:][-1]
             g_bit = str(bin(g))[2:][-1]
             b_bit = str(bin(b))[2:][-1]
-            print(bin(r),bin(g), bin(b), end=' ')
+            
 
             lsbits = [r_bit, g_bit, b_bit]
 
@@ -176,7 +178,6 @@ class LSB(Watermark):
                         spliter_counter += 1
                     #print(extracted)
             x+=1
-        print(extracted)
         self.lsb_str = extracted
 
                 
