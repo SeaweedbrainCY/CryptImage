@@ -1,3 +1,5 @@
+#from cryptimage.imageToSign  import ImageToSign
+
 class CryptImage:
     imageURL: str # Current path of the image to verify
     password: str # Password given by the user
@@ -6,7 +8,8 @@ class CryptImage:
 
     def __init__(self,imageURL, password):
         if imageURL == "" or imageURL == None or password == "" or password == None :
-            raise Exception("Fatal error : User must provide an valide image path and a valid password")
+            raise Exception("Fatal error : User must provide an valid image path and a valid password")
+        #super().__init__(imageURL, password)
         self.imageURL = imageURL
         self.password = password
 
@@ -17,7 +20,9 @@ class CryptImage:
     """
 
     def sign(self): 
+        #imageSigned = ImageToSign(self.imageURL, self.password)
         pass
+
 
 
     """
