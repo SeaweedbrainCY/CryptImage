@@ -39,7 +39,7 @@ print("""\n
 Version beta 1""")
 
 cmd = ""
-while cmd != "1" :
+while cmd != "1" and cmd !="2":
     print("\n\nVoulez vous : \n\n   1. Signer une image\n   2. Réclamer la propriété d'une image (indisponible)")
     print("\n > ", end='')
     cmd = input()
@@ -57,5 +57,17 @@ if cmd== "1":
     from cryptimage.imageToSign import ImageToSign
 
     image = ImageToSign(path, password)
+elif cmd=="2":
+    print("\n\n\n ##### VÉRIFICATION DE PROPRIÉTÉ D'IMAGE #####")
+    print("\n[*] Chemin absolu de l'image ")
+    path = input(">")
+    print("\n[*]Attention. Votre mot de passe est l'unique preuve de propriété capable d'en réclamer la légitimité une fois la photo signée. CryptImage ne sera pas en mesure de le récupérer")
+    print("\n[*] Mot de passe")
+    password = input(">")
+
+
+    from cryptimage.imageToVerify import ImageToVerify
+
+    image = ImageToVerify(path, password)
 
 
