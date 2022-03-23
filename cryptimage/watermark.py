@@ -76,7 +76,7 @@ class Watermark(CryptImage) :
         Generate the image related to the watermark
     """
     def generateWatermarkImage(self):
-        qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_H,box_size=10,border=0)
+        qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_H,box_size=2,border=0)
         qr.add_data(self.watermark_str)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black",back_color="white").convert('RGB')
@@ -89,9 +89,9 @@ class Watermark(CryptImage) :
     def stripQRCodeCorners(self):   
         qr = Image.open(self.qrcodePath)
         qr_code = np.array(qr) 
-        transparent_area = (0,0,79,79) #carré en haut à gauche
-        transparent_area2=(qr_code.shape[0]-80,0,qr_code.shape[0],79) #carré en haut à droite
-        transparent_area3=(0,qr_code.shape[0]-80,79,qr_code.shape[0]) #carré en bas à gauche
+        transparent_area = (0,0,13,13) #carré en haut à gauche
+        transparent_area2=(qr_code.shape[0]-14,0,qr_code.shape[0],13) #carré en haut à droite
+        transparent_area3=(0,qr_code.shape[0]-14,13,qr_code.shape[0]) #carré en bas à gauche
         mask=Image.new('L', qr.size, color=255)
         draw=ImageDraw.Draw(mask) 
         draw.rectangle(transparent_area, fill=0)
@@ -102,6 +102,31 @@ class Watermark(CryptImage) :
         qr.putalpha(mask)
         qr.save(self.qrcodePath)
 
+    """
+    Replacer 1 bloc du QR code
+    """
+    def refaire_bloc(self,x,y):
+        n=(0,0,0,255) #code d'un pixel noir
+        b=(255,255,255,255)
+        i2=j2=0
+        im = Image.open(self.qrcodePath)
+        pixels = im.load()
+        matrice_pixels=[[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n]]
+        for i in range(x,x+14):
+            for j in range(y,y+14):
+                pixels[i,j]=matrice_pixels[i2][j2]
+                j2+=1
+            i2+=1
+            j2=0
+        im.save(self.qrcodePath)
+
+    """
+    Replacer les 3 blocs du QR code
+    """
+    def refaire_3_blocs(self):
+        self.refaire_bloc(0,0)
+        self.refaire_bloc(len(self.qrCodePixelsBytes)-14,0)
+        self.refaire_bloc(0,len(self.qrCodePixelsBytes)-14)
 
     """
         Copy and create the signed-image to be in the right location
@@ -119,7 +144,18 @@ class Watermark(CryptImage) :
     """
 
     def convertToPNG(self):
-        pass
+        img = Image.open(self.imageURL)
+        try :
+           if img.format!="PNG":
+               splited = self.imageURL.split('.')
+               if len(splited) == 1 or len(splited) == 2:
+                   self.imageURL = splited[0] + ".png"
+               else :
+                   raise Exception("FATAL ERROR : The path to the file isn't correct") 
+
+               img.save(self.imageURL)
+        except :
+           raise Exception("FATAL ERROR : The file isn't an image") 
 
     """
         Generate a random position in the image where the watermark CAN be embedded
@@ -232,7 +268,7 @@ class Watermark(CryptImage) :
             y=0
         self.qrCodePixelsBytes = qrCodeExtracted
       
-
+    
         """
             Test if the motif is correct according to the user 
             Return True is ok, False if not
