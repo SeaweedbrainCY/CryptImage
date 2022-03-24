@@ -6,3 +6,4 @@ scipy
 qrcode
 imageio
 bitarray
+opencv-python
