@@ -7,6 +7,10 @@ qrcode
 imageio
 bitarray
 <<<<<<< HEAD
+<<<<<<< HEAD
 pycrypto
 =======
 >>>>>>> 34fa667cb20dfff3a2bded6c130999b57d3c96a9
+=======
+opencv-python
+>>>>>>> 319c6d7fdd44405757a48128bbe36a170944fa9b

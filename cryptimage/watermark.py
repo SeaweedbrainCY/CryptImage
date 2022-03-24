@@ -9,7 +9,7 @@ from cryptimage.neuralHash import NeuralHash
 from scipy import misc
 import qrcode
 import numpy as np
-import imageio
+import cv2
 from PIL import Image,ImageDraw
 from random import randint
 
@@ -22,7 +22,6 @@ class Watermark(CryptImage) :
     qrCodePixelsBytes = [] # Matrice stockant les pixels du QR code 1: blanc, 0: noir
 
     def __init__(self, imageURL, password):
-        print("watermark")
         super().__init__(imageURL, password)
         
     
@@ -46,6 +45,13 @@ class Watermark(CryptImage) :
         self.watermarkPosition = self.generateRandomPosition() 
         print("Ok")
 
+        print("[*] Préparation du motif  ...", end=' ')
+        self.stripQRCodeCorners()
+        print("Ok")
+
+        print("[*] Préparation des données du motif ...", end=' ')
+        self.generateQrCodeMatrice()
+
         print("[*] Intégration du motif dans l'image ...", end=' ')
         self.emebedWatermark()
         print("Ok")
@@ -64,9 +70,16 @@ class Watermark(CryptImage) :
         self.extractWatermark()
         print("Ok")
 
-        print("[*] Reconstruction du motif ... ", end=' ')
+        print("[*] Reconstruction du motif 1/3 ... ", end=' ')
         self.reconstructQRCode()
+        print("Ok")
+
+        print("[*] Reconstruction du motif 2/3 ... ", end=' ')
         self.refaire_3_blocs()
+        print("Ok")
+
+        print("[*] Reconstruction du motif 3/3 ... ", end=' ')
+        self.addBorder()
         print("Ok")
 
         print("[*] Extraction des données cotenus dans le motif ...", end=' ')
@@ -114,12 +127,14 @@ class Watermark(CryptImage) :
         qr.make(fit=True)
         img = qr.make_image(fill_color="black",back_color="white").convert('RGB')
         img.save(self.qrcodePath)
+        img.save("original.png")
         self.stripQRCodeCorners()
 
     """
     Enlever les 3 carrés délimitant le QRcode
     """    
-    def stripQRCodeCorners(self):   
+    def stripQRCodeCorners(self):  
+        print("strip corner") 
         qr = Image.open(self.qrcodePath)
         qr_code = np.array(qr) 
         transparent_area = (0,0,13,13) #carré en haut à gauche
@@ -233,11 +248,8 @@ class Watermark(CryptImage) :
         Embed the generated watermark (as an image) in the image
     """
     def emebedWatermark(self):
-
-        self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
-        self.qrCodePixelsBytes = [[0,0], [1,1]]
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
-        (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
+        (top_right_x, top_right_y) = self.watermarkPosition["top_right"]
 
        
         im = Image.open(self.finalImageURL)
@@ -253,11 +265,20 @@ class Watermark(CryptImage) :
                     (r,g,b, a) = pixel
                 (new_r, new_g, new_b) = (r,g,b)
                 if j < top_right_y + 1:
-                    new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
+                    if self.qrCodePixelsBytes[x][y] != -1:
+                        new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
+                    else :
+                        new_r = r
                 if j+1 < top_right_y + 1:
-                    new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
+                    if self.qrCodePixelsBytes[x][y+1] != -1:
+                        new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
+                    else :
+                        new_g = g
                 if j+2 < top_right_y + 1:
-                    new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
+                    if self.qrCodePixelsBytes[x][y+2] != -1:
+                        new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
+                    else :
+                        new_b = b
                 if im.mode == "RGB":
                     pixelMap[i,j] = (new_r, new_g, new_b)
                 else :
@@ -346,29 +367,68 @@ class Watermark(CryptImage) :
     Reconstruit le qr code à partir de la matrice
     """
     def reconstructQRCode(self):
-        #print("test")
-        code = Image.new(mode="RGBA", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)))
-        code.show()
+        print("test")
+        self.qrcodePath = "tmpQR.png"
+        qrcode = Image.new(mode="RGB", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)), color="white")
+        qrcode.save(self.qrcodePath)
+        pixels = qrcode.load()
 
-        #width, height = code.size
-        #pixels = code.load()
+        width, height = qrcode.size
+        pixels = qrcode.load()
+        i=0
+        j=0
+        for x in range(width):
+            for y in range(height):
+                if self.qrCodePixelsBytes[i][j] == -1:
+                    pixels[x,y] = 0,0,0
+                elif self.qrCodePixelsBytes[i][j] == 1:
+                     pixels[x,y] = 255,255,255
+                else :
+                     pixels[x,y] = 0,0,0
+                j+=1
+            i+=1
+            j=0
+        qrcode.save(self.qrcodePath)
+        self.stripQRCodeCorners()
 
-        #for x in range(width):
-        #    for y in range(height):
-        #        if self.qrCodePixelsBytes[x][y] == -1:
-        #            pixels[x,y] = 0,0,0,0
-        #        elif self.qrCodePixelsBytes[x][y] == 0:
-        #             pixels[x,y] = 255,255,255,1
-        #        else :
-        #             pixels[x,y] = 0,0,0,1
-        #code.save("new.png")
+    
+    """
+        Add border to a qr code
+    """
+    def addBorder(self):
+        qrcode = Image.new(mode="RGB", size=(len(self.qrCodePixelsBytes)+8,len(self.qrCodePixelsBytes )+ 8), color="white")
+        old = Image.open(self.qrcodePath)
+        width,_ = qrcode.size
+        old_pixels = old.load()
+        newPixels = qrcode.load()
+        i,j = 0,0
+        for x in range(4,width-4):
+            for y in  range(4,width-4):
+                newPixels[x,y] = old_pixels[i,j]
+                j+=1
+            i+=1 
+            j=0
+        qrcode.save(self.qrcodePath)
+
+        
 
 
     """
     Read the qr code data 
     """
     def readQRcode(self):
-        pass
+        print(self.qrcodePath)
+        image = cv2.imread(self.qrcodePath)
+        # initialize the cv2 QRCode detector
+        detector = cv2.QRCodeDetector()
+        # detect and decode
+        data, vertices_array, _ = detector.detectAndDecode(image)
+        # if there is a QR code
+        # print the data
+        if vertices_array is not None:
+            self.watermark_str = data
+        else :
+            raise Exception("FATAL ERROR : The watermark is corrupted")
 
 
 
