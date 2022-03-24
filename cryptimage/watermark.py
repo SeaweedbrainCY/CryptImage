@@ -22,23 +22,68 @@ class Watermark(CryptImage) :
     qrCodePixelsBytes = [] # Matrice stockant les pixels du QR code 1: blanc, 0: noir
 
     def __init__(self, imageURL, password):
+        print("watermark")
         super().__init__(imageURL, password)
-        self.generateWatermarkString()
+        
     
     """
         Manage the watermark creation 
         Return True or  raise an exception if fail
     """
-    def main(self):
-        newPath = self.imageCopy() 
-        watermarkPosition = self.generateRandomPosition()
+    def mainWatermarkSignature(self):
+        self.imageCopy() 
+        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+
+        print("[*] Génération de la signature  ...", end=' ')
+        self.generateWatermarkString()
+        print("Ok")
+
+        print("[*] Génération du motif ...", end=' ')
         self.generateWatermarkImage()
-        self.emebedWatermark(watermarkPosition)
-        if newPath == None or watermarkPosition == None :
-            raise Exception("FATAL ERROR : the signed-image to be or the watermark position are unknown")
-        self.finalImageURL = newPath
-        self.watermarkPosition = watermarkPosition 
+        print("Ok")
+
+        print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
+        self.watermarkPosition = self.generateRandomPosition() 
+        print("Ok")
+
+        print("[*] Intégration du motif dans l'image ...", end=' ')
+        self.emebedWatermark()
+        print("Ok")
+
         return True
+
+    """
+        Extraction the watermark creation 
+        Return True or  raise an exception if fail
+    """
+    def mainWatermarkVerify(self):
+        self.imageCopy() 
+        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+
+        print("[*] Extraction des données constituant le motif ... ", end=' ')
+        self.extractWatermark()
+        print("Ok")
+
+        print("[*] Reconstruction du motif ... ", end=' ')
+        self.reconstructQRCode()
+        self.refaire_3_blocs()
+        print("Ok")
+
+        print("[*] Extraction des données cotenus dans le motif ...", end=' ')
+        self.readQRcode()
+        print("Ok")
+
+        print("[*] Verification de la preuve de propriété ...", end=' ')
+        isOk =  self.checkWatermark()
+        if not isOk:
+            print("Ok")
+
+        return isOk
+
+        
+
+
+   
 
 
     """
@@ -64,7 +109,7 @@ class Watermark(CryptImage) :
         Generate the image related to the watermark
     """
     def generateWatermarkImage(self):
-        qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_H,box_size=10,border=0)
+        qr = qrcode.QRCode(version=1,error_correction=qrcode.constants.ERROR_CORRECT_H,box_size=2,border=0)
         qr.add_data(self.watermark_str)
         qr.make(fit=True)
         img = qr.make_image(fill_color="black",back_color="white").convert('RGB')
@@ -77,9 +122,9 @@ class Watermark(CryptImage) :
     def stripQRCodeCorners(self):   
         qr = Image.open(self.qrcodePath)
         qr_code = np.array(qr) 
-        transparent_area = (0,0,79,79) #carré en haut à gauche
-        transparent_area2=(qr_code.shape[0]-80,0,qr_code.shape[0],79) #carré en haut à droite
-        transparent_area3=(0,qr_code.shape[0]-80,79,qr_code.shape[0]) #carré en bas à gauche
+        transparent_area = (0,0,13,13) #carré en haut à gauche
+        transparent_area2=(qr_code.shape[0]-14,0,qr_code.shape[0],13) #carré en haut à droite
+        transparent_area3=(0,qr_code.shape[0]-14,13,qr_code.shape[0]) #carré en bas à gauche
         mask=Image.new('L', qr.size, color=255)
         draw=ImageDraw.Draw(mask) 
         draw.rectangle(transparent_area, fill=0)
@@ -90,12 +135,40 @@ class Watermark(CryptImage) :
         qr.putalpha(mask)
         qr.save(self.qrcodePath)
 
+    """
+    Replacer 1 bloc du QR code
+    """
+    def refaire_bloc(self,x,y):
+        n=(0,0,0,255) #code d'un pixel noir
+        b=(255,255,255,255)
+        i2=j2=0
+        im = Image.open(self.qrcodePath)
+        pixels = im.load()
+        matrice_pixels=[[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,n,n,n,n,n,n,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,b,b,b,b,b,b,b,b,b,b,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n],[n,n,n,n,n,n,n,n,n,n,n,n,n,n]]
+        for i in range(x,x+14):
+            for j in range(y,y+14):
+                pixels[i,j]=matrice_pixels[i2][j2]
+                j2+=1
+            i2+=1
+            j2=0
+        im.save(self.qrcodePath)
+
+    """
+    Replacer les 3 blocs du QR code
+    """
+    def refaire_3_blocs(self):
+        self.refaire_bloc(0,0)
+        self.refaire_bloc(len(self.qrCodePixelsBytes)-14,0)
+        self.refaire_bloc(0,len(self.qrCodePixelsBytes)-14)
 
     """
         Copy and create the signed-image to be in the right location
     """
     def imageCopy(self):
-        pass
+        self.finalImageURL = "final.png"
+        im = Image.open(self.imageURL)
+        im.save(self.finalImageURL)
+        
 
 
     """
@@ -104,25 +177,64 @@ class Watermark(CryptImage) :
     """
 
     def convertToPNG(self):
-        pass
+        img = Image.open(self.imageURL)
+        try :
+           if img.format!="PNG":
+               splited = self.imageURL.split('.')
+               if len(splited) == 1 or len(splited) == 2:
+                   self.imageURL = splited[0] + ".png"
+               else :
+                   raise Exception("FATAL ERROR : The path to the file isn't correct") 
+
+               img.save(self.imageURL)
+        except :
+           raise Exception("FATAL ERROR : The file isn't an image") 
 
     """
         Generate a random position in the image where the watermark CAN be embedded
     """
     def generateRandomPosition(self):
-        M = misc.imread(self.imageURL)
-        M.shape
-        i_qr = random.randint(qr.shape,M.shape-qr.shape-1) #abscisse du QR code
-        j_qr = random.randint(qr.shape,M.shape-qr.shape-1) #ordonnée du QR code
+        im = Image.open(self.imageURL)
+        width, height = im.size
+        x_qr = randint(1,width - len(self.qrCodePixelsBytes)-1) #abscisse du QR code
+        y_qr = randint(3,height - len(self.qrCodePixelsBytes)-1)  #ordonnée du QR code
+        self.watermarkPosition = {"top_left":(x_qr, y_qr), "top_right":(x_qr + len(self.qrCodePixelsBytes), y_qr + len(self.qrCodePixelsBytes))}
 
 
+    """ 
+    Generate the tab associated to a QR code
+    """
+
+    def generateQrCodeMatrice(self):
+        im = Image.open(self.qrcodePath)
+        pixels = im.load()
+        width, height = im.size    
+        matrix = []
+
+        for x in range(width):
+            tmp = []
+            for y in range(height):
+ 
+                (r,g,b, a) = pixels[x,y]
+                if a == 0:
+                    tmp.append(-1)
+                    
+                elif (r,g,b) == (255,255,255):
+                    tmp.append(1)
+                else :
+                    tmp.append(0)
+            matrix.append(tmp)
+        self.qrCodePixelsBytes = matrix
+        
+        
+        
+        
     """
         Embed the generated watermark (as an image) in the image
     """
     def emebedWatermark(self):
 
         self.watermarkPosition = {"top_left" : (0,0), "bottom_left" : (1,1)}
-        self.finalImageURL = "/Users/stchepinskynathan/Downloads/test.png"
         self.qrCodePixelsBytes = [[0,0], [1,1]]
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (top_right_x, top_right_y) = self.watermarkPosition["bottom_left"]
@@ -135,7 +247,10 @@ class Watermark(CryptImage) :
         for i in range(top_left_x, top_right_x+1):
             for j in range(top_left_y, top_right_y+3, 3):
                 pixel = pixelMap[i,j]
-                (r,g,b, a) = pixel
+                if im.mode == "RGB":
+                    (r,g,b) = pixel
+                else :
+                    (r,g,b, a) = pixel
                 (new_r, new_g, new_b) = (r,g,b)
                 if j < top_right_y + 1:
                     new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
@@ -143,7 +258,10 @@ class Watermark(CryptImage) :
                     new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
                 if j+2 < top_right_y + 1:
                     new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
-                pixelMap[i,j] = (new_r, new_g, new_b,a)
+                if im.mode == "RGB":
+                    pixelMap[i,j] = (new_r, new_g, new_b)
+                else :
+                    pixelMap[i,j] = (new_r, new_g, new_b,a)
                 y+=1
             x+=1
             y=0
@@ -170,7 +288,10 @@ class Watermark(CryptImage) :
             tmp = [] 
             for j in range(top_left_y, top_right_y+3, 3):
                 pixel = pixelMap[i,j]
-                (r,g,b, a) = pixel
+                if im.mode == "RGB":
+                    (r,g,b) = pixel
+                else:
+                    (r,g,b, a) = pixel
                 if j < top_right_y + 1:
                     tmp.append(str(bin(r)[-1]))
                 if j+1 < top_right_y + 1:
@@ -183,7 +304,7 @@ class Watermark(CryptImage) :
             y=0
         self.qrCodePixelsBytes = qrCodeExtracted
       
-
+    
         """
             Test if the motif is correct according to the user 
             Return True is ok, False if not
@@ -201,7 +322,7 @@ class Watermark(CryptImage) :
             
         splited = self.watermark_str.split(',')
         if len(splited) != 2:
-            print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
+            print("\n\n[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner\n\n")
             return False
 
         extractedHash = splited[0]
@@ -211,14 +332,46 @@ class Watermark(CryptImage) :
         if not crypto.verify_signature(extractedSignature, extractedHash):
             print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
             return False 
-        if extractedHash != hashed_text :
-            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
-            return False 
-        else : 
+        print(extractedHash)
+        print(hashed_text)
+        if extractedHash == hashed_text :
             return True 
+        else : 
+            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
+            return False
+            
 
             
-            
+    """
+    Reconstruit le qr code à partir de la matrice
+    """
+    def reconstructQRCode(self):
+        #print("test")
+        code = Image.new(mode="RGBA", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)))
+        code.show()
+
+        #width, height = code.size
+        #pixels = code.load()
+
+        #for x in range(width):
+        #    for y in range(height):
+        #        if self.qrCodePixelsBytes[x][y] == -1:
+        #            pixels[x,y] = 0,0,0,0
+        #        elif self.qrCodePixelsBytes[x][y] == 0:
+        #             pixels[x,y] = 255,255,255,1
+        #        else :
+        #             pixels[x,y] = 0,0,0,1
+        #code.save("new.png")
+
+
+    """
+    Read the qr code data 
+    """
+    def readQRcode(self):
+        pass
+
+
+
         
 
 

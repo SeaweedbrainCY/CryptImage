@@ -6,4 +6,7 @@ scipy
 qrcode
 imageio
 bitarray
+<<<<<<< HEAD
 pycrypto
+=======
+>>>>>>> 34fa667cb20dfff3a2bded6c130999b57d3c96a9
