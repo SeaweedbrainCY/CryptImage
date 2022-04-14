@@ -2,11 +2,9 @@
         Generate the watermark and embed it in the image which path is super.imageURL
 """
 from hashlib import sha256
-from os import lseek
 from cryptimage.cryptImage import CryptImage
 from cryptimage.cryptography import Cryptography
 from cryptimage.neuralHash import NeuralHash
-from scipy import misc
 import qrcode
 import numpy as np
 import cv2
@@ -302,6 +300,11 @@ class Watermark(CryptImage) :
             y=0
         im.save(self.finalImageURL)
 
+        for i in range(top_left_x, bottom_right_x):
+            for j in range(top_left_y, bottom_right_y):
+                (r,g,b) = pixelMap[i,j]
+                print(i,",", j, ":", bin(r), " ", bin(g), " ", bin(b))
+
 
 
 
@@ -320,6 +323,11 @@ class Watermark(CryptImage) :
         pixelMap = im.load()
         x=0
         y=0
+
+        for i in range(top_left_x, bottom_right_x):
+            for j in range(top_left_y, bottom_right_y):
+                (r,g,b) = pixelMap[i,j]
+                print(i,",", j, ":", bin(r), " ", bin(g), " ", bin(b))
 
         width = bottom_right_x - top_left_x 
         #y_lim =  int(width/3)+ width%3
