@@ -40,7 +40,7 @@ Version beta 1""")
 
 cmd = ""
 while cmd != "1" and cmd !="2":
-    print("\n\nVoulez vous : \n\n   1. Signer une image\n   2. Réclamer la propriété d'une image (indisponible)")
+    print("\n\nVoulez vous : \n\n   1. Signer une image\n   2. Réclamer la propriété d'une image")
     print("\n > ", end='')
     cmd = input()
 
