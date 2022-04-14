@@ -34,7 +34,7 @@ class LSB(Watermark):
         
         print("[*] Déchiffrement des données cachées ...",  end=' ')
         self.decryptLSBString()
-        print("Ok")
+        print("Ok. Déchiffré : ", self.watermarkPosition )
 
     """
         Genere le message chiffre a integrer dans les LSB
