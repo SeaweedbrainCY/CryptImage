@@ -11,6 +11,7 @@ import cv2
 from PIL import Image,ImageDraw
 from random import randint
 
+
 class Watermark(CryptImage) : 
     watermark_str = "" # The string to embed in the image
     finalImageURL = "" # Final path of the image signed
@@ -30,7 +31,7 @@ class Watermark(CryptImage) :
     def mainWatermarkSignature(self):
         self.imageCopy() 
         print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
-
+        
         print("[*] Génération de la signature  ...", end=' ')
         self.generateWatermarkString()
         print("Ok")
@@ -50,11 +51,11 @@ class Watermark(CryptImage) :
         print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
         self.generateRandomPosition() 
         print("Ok Position : ", self.watermarkPosition)
-
+        
         print("[*] Intégration du motif dans l'image ...", end=' ')
         self.emebedWatermark()
         print("Ok")
-
+        
         return True
 
     """

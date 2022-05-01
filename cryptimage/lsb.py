@@ -84,7 +84,7 @@ class LSB(Watermark):
     """
     def embedInLSB(self):
         #Importation de l'image a encoder
-        im = Image.open(self.imageURL)
+        im = Image.open(self.finalImageURL) # L'image a déjà été modifiée par watermark
         width, height = im.size
         pixels = im.load()
 

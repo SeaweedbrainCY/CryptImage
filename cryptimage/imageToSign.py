@@ -2,6 +2,7 @@ from cryptimage.cryptography import Cryptography
 from cryptimage.lsb import LSB
 from cryptimage.watermark import Watermark
 
+
 class ImageToSign(Cryptography, LSB):
     imageURL= "" # Current path of the image to verify
     password= "" # Password given by the user
@@ -16,7 +17,9 @@ class ImageToSign(Cryptography, LSB):
 
     def main(self):
         if self.mainWatermarkSignature() :
+            
             self.mainLSBSignature()
+            
         else :
             raise Exception("FATAL ERROR : An error occured with generating the watermark")
         
