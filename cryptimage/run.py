@@ -55,7 +55,7 @@ if cmd== "1":
 
 
     from cryptimage.imageToSign import ImageToSign
-
+    print("[*] Signature de l'image ...")
     image = ImageToSign(path, password)
 elif cmd=="2":
     print("\n\n\n ##### VÉRIFICATION DE PROPRIÉTÉ D'IMAGE #####")
@@ -67,7 +67,7 @@ elif cmd=="2":
 
 
     from cryptimage.imageToVerify import ImageToVerify
-
+    print("[*] Vérification de l'image ...")
     image = ImageToVerify(path, password)
 
 

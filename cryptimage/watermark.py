@@ -216,8 +216,9 @@ class Watermark(CryptImage) :
         x_qr = randint(1,width - len(self.qrCodePixelsBytes)-1) #abscisse du QR code
         y_qr = randint(3,height - len(self.qrCodePixelsBytes)-1)  #ordonnée du QR code
         print(width, height)
+        print(len(self.qrCodePixelsBytes))
         width = int(len(self.qrCodePixelsBytes)/3)+ len(self.qrCodePixelsBytes)%3
-        self.watermarkPosition = {"top_left":(x_qr, y_qr), "bottom_right":(x_qr +width , y_qr +width), "nbPixels":len(self.qrCodePixelsBytes)}
+        self.watermarkPosition = {"top_left":(x_qr, y_qr), "bottom_right":(x_qr + width , y_qr + len(self.qrCodePixelsBytes)), "nbPixels":len(self.qrCodePixelsBytes)}
 
 
     """ 
@@ -243,7 +244,7 @@ class Watermark(CryptImage) :
                 else :
                     tmp.append(0)
             matrix.append(tmp)
-        print(matrix)
+        #print(matrix)
         self.qrCodePixelsBytes = matrix
         
         
@@ -256,55 +257,72 @@ class Watermark(CryptImage) :
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (bottom_right_x, bottom_right_y) = self.watermarkPosition["bottom_right"]
 
+        import os 
+        print("BEFORE")
+        os.system("md5 test2_signed.png")
        
         im = Image.open(self.finalImageURL)
         pixelMap = im.load()
         x=0
         y=0
 
-        print("WIDDTH = ",  bottom_right_x - top_left_x)
+        matrix_len = self.watermarkPosition["nbPixels"]
 
-        for i in range(top_left_x, bottom_right_x):
-            for j in range(top_left_y, bottom_right_y):
+        print("WIDDTH = ",  bottom_right_x - top_left_x)
+        print("HEIGHT = ", bottom_right_y - top_left_y)
+
+        for j in range(top_left_y, bottom_right_y):
+            for i in range(top_left_x, bottom_right_x):
                 pixel = pixelMap[i,j]
+                print("x,y = ",  x, "," ,y)
                 if im.mode == "RGB":
                     (r,g,b) = pixel
                 else :
                     (r,g,b, a) = pixel
                 (new_r, new_g, new_b) = (r,g,b)
-                if j < bottom_right_y + 1:
+                if y < matrix_len :
                     print(self.qrCodePixelsBytes[x][y] , end=' ')
                     if self.qrCodePixelsBytes[x][y] != -1:
                         new_r = int(str(bin(r)[2:-1]) + str(self.qrCodePixelsBytes[x][y]), 2)
                     else :
                         new_r = r
-                if j+1 < bottom_right_y + 1:
+                if y+1 < matrix_len :
                     print(self.qrCodePixelsBytes[x][y+1] , end=' ')
                     if self.qrCodePixelsBytes[x][y+1] != -1:
                         new_g = int(bin(g)[2:-1] + str(self.qrCodePixelsBytes[x][y+1]), 2)
                     else :
                         new_g = g
-                if j+2 < bottom_right_y + 1:
+                if y+2 < matrix_len :
                     print(self.qrCodePixelsBytes[x][y+2] , end=' ')
                     if self.qrCodePixelsBytes[x][y+2] != -1:
                         new_b = int(bin(b)[2:-1] + str(self.qrCodePixelsBytes[x][y+2]),2)
-                    else :
-                        new_b = b
+                else :
+                    print("!!! Y+2 > MATRIX LEN : ", y+2 , ">", matrix_len)
+                    new_b = b
                 
                 print("(", i, ",", j, ") : Bin = " , bin(r), "-->", bin(new_r), " ", bin(g), "-->", bin(new_g), " ",bin(b), "-->", bin(new_b))
                 if im.mode == "RGB":
                     pixelMap[i,j] = (new_r, new_g, new_b)
                 else :
                     pixelMap[i,j] = (new_r, new_g, new_b,a)
-                y+=1
+                y+=3
             x+=1
             y=0
         im.save(self.finalImageURL)
-
-        for i in range(top_left_x, bottom_right_x):
-            for j in range(top_left_y, bottom_right_y):
-                (r,g,b) = pixelMap[i,j]
-                print(i,",", j, ":", bin(r), " ", bin(g), " ", bin(b))
+        print("AFTER")
+        os.system("md5 test2_signed.png")
+        im = Image.open(self.finalImageURL)
+        pixelMap = im.load()
+        
+        #for i in range(top_left_x, bottom_right_x):
+        #    for j in range(top_left_y, bottom_right_y):
+        #        (r,g,b) = pixelMap[i,j]
+        #        if y+1 < matrix_len and y+2<matrix_len and y<matrix_len :
+        #            print("matrix = ", self.qrCodePixelsBytes[x][y], " ", self.qrCodePixelsBytes[x][y+1], " ", self.qrCodePixelsBytes[x][y+2] )
+        #        print(i,",", j, ":", str(bin(r)), " ", str(bin(g)), " ", str(bin(b)))
+        #        y+=3
+        #    x+=1
+        #    y=0
 
 
 
@@ -330,7 +348,8 @@ class Watermark(CryptImage) :
                 (r,g,b) = pixelMap[i,j]
                 print(i,",", j, ":", bin(r), " ", bin(g), " ", bin(b))
 
-        width = bottom_right_x - top_left_x 
+        width = bottom_right_x - top_left_x +1
+        height = bottom_right_y - top_left_y +1
         #y_lim =  int(width/3)+ width%3
         print(width)
         #print(y_lim)
@@ -340,25 +359,26 @@ class Watermark(CryptImage) :
 
         
 
-        for i in range(width):
+        for y in range(top_left_y, bottom_right_y):
             tmp = []
-            for j in range(width):
-                pixel = pixelMap[top_left_x + i, top_left_y + j]
+            for x in range(top_left_x, bottom_right_x):
+                pixel = pixelMap[ x, y]
                 if im.mode == "RGB":
                     (r,g,b) = pixel
                 else:
                     (r,g,b, _) = pixel
-                print("\nPixel (", top_left_x + i, ",", top_left_y + j, ") :")
-                if j <  width:
-                    print("Rouge = ", bin(r), " --> " ,str(bin(r)[-1]))
+                #print("\nPixel (",  i, ",",  j, ") :")
+
+                if len(tmp)  <  nbPixels :
+                    #print("Rouge = ", bin(r), " --> " ,str(bin(r)[-1]))
                     #qrCodeExtracted[i][j] =  str(bin(r)[-1])
                     tmp.append( str(bin(r)[-1]))
-                if j+1 <  width:
-                    print("Vert = ", bin(g), " --> " ,str(bin(g)[-1]))
+                if  len(tmp) <  nbPixels:
+                    #print("Vert = ", bin(g), " --> " ,str(bin(g)[-1]))
                     #qrCodeExtracted[i][j+1] = str(bin(g)[-1])
                     tmp.append(str(bin(g)[-1]))
-                if j+2 <  width:
-                    print("Bleu = ", bin(b) , " --> " ,str(bin(b)[-1]))
+                if  len(tmp)  <  nbPixels:
+                    #print("Bleu = ", bin(b) , " --> " ,str(bin(b)[-1]))
                     #qrCodeExtracted[i][j+2] = str(bin(b)[-1])
                     tmp.append(str(bin(b)[-1]))
             qrCodeExtracted.append(tmp)
@@ -396,14 +416,16 @@ class Watermark(CryptImage) :
 
             # First step : Verify the signature 
         if not crypto.verify_signature(extractedSignature, extractedHash):
-            print("[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner ")
+            print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
             return False 
+        else :
+            print("[*] Signature verified")
         print(extractedHash)
         print(hashed_text)
         if extractedHash == hashed_text :
             return True 
         else : 
-            print("[!] REQUEST REJECTED [!]\nYou are NOT the rightfull owner ")
+            print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
             return False
             
 
@@ -413,13 +435,13 @@ class Watermark(CryptImage) :
     """
     def reconstructQRCode(self):
         self.qrcodePath = "tmpQR_reconstructed.png"
-        qrcode = Image.new(mode="RGB", size=(len(self.qrCodePixelsBytes),len(self.qrCodePixelsBytes)), color="white")
+        qrcode = Image.new(mode="RGB", size=(len(self.qrCodePixelsBytes[0]),len(self.qrCodePixelsBytes[0])), color="white")
         qrcode.save(self.qrcodePath)
         pixels = qrcode.load()
 
         width, height = qrcode.size
         print("qrcode.size = ", qrcode.size)
-        print("len self.qrCodePixelsBytes = ", len(self.qrCodePixelsBytes[0]) )
+        print("len self.qrCodePixelsBytes = ", len(self.qrCodePixelsBytes), "len self.qrCodePixelsBytes[0] = ", len(self.qrCodePixelsBytes[0]) )
         pixels = qrcode.load()
         i=0
         j=0
