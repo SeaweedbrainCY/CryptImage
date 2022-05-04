@@ -60,10 +60,10 @@ if cmd== "1":
 elif cmd=="2":
     print("\n\n\n ##### VÉRIFICATION DE PROPRIÉTÉ D'IMAGE #####")
     print("\n[*] Chemin absolu de l'image ")
-    path = input(">")
+    path = input(" > ")
     print("\n[*]Attention. Votre mot de passe est l'unique preuve de propriété capable d'en réclamer la légitimité une fois la photo signée. CryptImage ne sera pas en mesure de le récupérer.")
     print("\n[*] Mot de passe")
-    password = input(">")
+    password = input(" > ")
 
 
     from cryptimage.imageToVerify import ImageToVerify

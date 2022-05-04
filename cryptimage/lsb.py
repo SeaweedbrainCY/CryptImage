@@ -26,6 +26,7 @@ class LSB(Watermark):
         print("[*] Intégration des données cachées dans l'image ...", end=' ')
         self.embedInLSB()
         print("Ok")
+        return True
 
     def mainLSBVerify(self):
         print("[*] Extraction des données cachées dans l'image ...",  end=' ')

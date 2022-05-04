@@ -17,8 +17,9 @@ class ImageToSign(Cryptography, LSB):
 
     def main(self):
         if self.mainWatermarkSignature() :
-            
-            self.mainLSBSignature()
+            if  self.mainLSBSignature() :
+                name = self.imageURL.split('.')
+                print("[*] Votre image a été protégée avec succès ! L'image signée est : " , name[0] , "_signed." , name[1])
             
         else :
             raise Exception("FATAL ERROR : An error occured with generating the watermark")
