@@ -53,7 +53,6 @@ if cmd== "1":
     print("\n[*] Mot de passe")
     password = input(">")
 
-
     from cryptimage.imageToSign import ImageToSign
 
     image = ImageToSign(path, password)
