@@ -1,0 +1,57 @@
+body{
+    background-color: #323232;
+    /*background: url("background.PNG") no-repeat center;*/
+}
+section {
+    display : flex;
+    flex-direction :column;
+    flex-wrap:wrap;
+}
+.boutonUpload {
+    border :0;
+    padding : 2 10 2 30px;
+    line-height : 4;
+    text-align : center;
+    background-color: #24d64b;
+    color: #fff;
+    text-shadow: 1px 1px 1px #000;
+    text-transform: uppercase;
+    font-size:x-large;
+    letter-spacing:2px;
+    border-radius:20px;
+    /*position:relative; top:30px; left:130px;*/
+    flex:4;
+    
+}
+.boutonUpload:hover {
+    background-color: #2BEA55;
+}
+.boutonProtect{
+    border:0;
+    background-color :darkgray;
+    height:100px;
+    width : 100px;
+    border-radius:20px;
+    /*position:relative; top:280px;left:-200px;*/
+    flex : 1;
+}
+.boutonProtect:hover{
+    background-color:rgb(190,190, 190)
+}
+
+.boutonVerify{
+    border:0;
+    background-color :darkgray;
+    height:100px;
+    width : 100px;
+    border-radius:20px;
+    /*position:relative; top:280px;left:-120px;*/
+    flex:1;
+}
+.boutonVerify:hover{
+    background-color:rgb(190,190, 190)
+}
+label{
+    /*position :relative; top: 130px;left:-430px;*/
+    flex : 2;
+}
