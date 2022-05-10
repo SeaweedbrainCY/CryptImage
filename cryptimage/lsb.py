@@ -26,6 +26,7 @@ class LSB(Watermark):
         print("[*] Intégration des données cachées dans l'image ...", end=' ')
         self.embedInLSB()
         print("Ok")
+        return True
 
     def mainLSBVerify(self):
         print("[*] Extraction des données cachées dans l'image ...",  end=' ')
@@ -34,7 +35,7 @@ class LSB(Watermark):
         
         print("[*] Déchiffrement des données cachées ...",  end=' ')
         self.decryptLSBString()
-        print("Ok")
+        print("Ok. Déchiffré : ", self.watermarkPosition )
 
     """
         Genere le message chiffre a integrer dans les LSB
@@ -84,7 +85,7 @@ class LSB(Watermark):
     """
     def embedInLSB(self):
         #Importation de l'image a encoder
-        im = Image.open(self.imageURL)
+        im = Image.open(self.finalImageURL) # L'image a déjà été modifiée par watermark
         width, height = im.size
         pixels = im.load()
 

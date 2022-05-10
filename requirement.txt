@@ -7,3 +7,4 @@ qrcode
 imageio
 bitarray
 opencv-python
+pycryptodome
