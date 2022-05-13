@@ -4,21 +4,40 @@
 </head>
 <body>
     <section>
-    <button class="boutonUpload" type="button">
-        <input type="file" id="actual-btn"/>
-        Upload
-    </button>
-    
-    <button class="boutonProtect" type="button">
-        <input type="image" src="cadenas.png" width="60px" height="60px">
-        Protect
-    </button>
-    <button class="boutonVerify" type="button">
-        <input type="image" src="loupe.png" width="60px" height="60px">
-        Verify
-    </button>
-    <label for="mdp" style="color :white">Veuillez saisir votre mot de passe :</label>
-    <input type="text" id="mdp" name="mdp" required
-       minlength="1" size="10" placeholder="Mot de passe">
+        <h1>
+            CryptImage
+        </h1>
+        <div id="Uploadcontainer">
+        <button class="boutonUpload" type="button">
+            <input type="file" id="actual-btn"/>
+            Upload
+        </button>
+        </div>
+        
+        <div id="buttonContainer">
+            <div>
+            <button class="boutonProtect" type="button">
+                <input type="image" src="cadenas.png" width="60px" >
+                Protect
+            </button>
+            </div>
+            <div>
+            <button class="boutonVerify" type="button">
+                <input type="image" src="loupe.png" width="60px" >
+                Verify
+            </button>
+            </div>
+        </div>
+        
+        <div id="mdp">
+        <label for="mdp" style="color :white">Veuillez saisir votre mot de passe :</label>
+        <input type="text" id="mdp" name="mdp" required
+        minlength="1" size="10" placeholder="Mot de passe">
+        </div>
+
+        <p>
+            Conçu par Nathan Stchepinsky, Thomas Perel, Fabio Gadegbeku et Victorine Cassé<br>
+            Pro 3600 2022
+        </p>
     </section>
 </body>

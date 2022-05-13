@@ -1,11 +1,58 @@
 body{
     background-color: #323232;
-    /*background: url("background.PNG") no-repeat center;*/
+    /*background-image: url("background.PNG");
+    height:100%;
+    background-repeat: no-repeat;
+    background-position: center center;*/
+
 }
 section {
     display : flex;
     flex-direction :column;
     flex-wrap:wrap;
+    width : 100%;
+    min-height : 90%;
+    align-items: center;
+    margin-top : 1%;
+    margin-bottom : 1%;
+}
+h1 {
+    display:flex;
+    margin-bottom:40px;
+    color : #00821E;
+    text-shadow:1px 1px 1px #fff;
+    font-size:400%;
+    text-decoration :underline;
+}
+#uploadcontainer{
+    display:flex;
+    width : 60%;
+    justify-content: center;
+    flex-wrap:wrap;
+}
+#buttonContainer{
+    display:flex;
+    flex-direction:row;
+    flex-wrap:wrap;
+    align-items: space-around;
+    justify-content: space-around;
+    margin-top:30px;
+    width : 50%;   
+}
+#mdp{
+    display:flex;
+    flex-direction:column;
+    margin-top:20px;
+    flex-wrap:wrap;
+}
+p{
+    display : flex;
+    flex-direction : column;
+    color:rgb(35, 91, 57);
+    font-size:small;
+    text-align: center;
+    flex-wrap:wrap;
+    margin-top:60px;
 }
 .boutonUpload {
     border :0;
@@ -19,7 +66,6 @@ section {
     font-size:x-large;
     letter-spacing:2px;
     border-radius:20px;
-    /*position:relative; top:30px; left:130px;*/
     flex:4;
     
 }
@@ -29,11 +75,11 @@ section {
 .boutonProtect{
     border:0;
     background-color :darkgray;
-    height:100px;
-    width : 100px;
-    border-radius:20px;
-    /*position:relative; top:280px;left:-200px;*/
+    height:150px;
+    width : 150px;
+    border-radius:25px;
     flex : 1;
+    font-size : medium;
 }
 .boutonProtect:hover{
     background-color:rgb(190,190, 190)
@@ -42,16 +88,17 @@ section {
 .boutonVerify{
     border:0;
     background-color :darkgray;
-    height:100px;
-    width : 100px;
-    border-radius:20px;
-    /*position:relative; top:280px;left:-120px;*/
+    height:150px;
+    width : 150px;
+    border-radius:25px;
     flex:1;
+    font-size :medium;
 }
 .boutonVerify:hover{
     background-color:rgb(190,190, 190)
 }
 label{
-    /*position :relative; top: 130px;left:-430px;*/
     flex : 2;
+    margin-top:20px;
+    font-size : large;
 }
