@@ -5,6 +5,7 @@ from binascii import b2a_base64
 import base64
 import ecies
 import os
+import mysql.connector
 """
     Perform all cryptography on images and data
 """
@@ -115,10 +116,37 @@ class Cryptography():
         except ValueError:
             return b.hex()
 
+
+
+    """
+        Calculate the Neural hash of the image
+    """
     def hash_image(self) -> str :
         try :
             image_hash_str = os.popen("cd /home/admin/; python3 AppleNeuralHash2ONNX/nnhash.py AppleNeuralHash2ONNX/NeuralHash/model.onnx AppleNeuralHash2ONNX/NeuralHash/neuralhash_128x96_seed1.dat " + self.imageURL).read()
         except :
             raise Exception("Impossible to calculate the image hash")
+
+        self.stock_image_neural_hash(image_hash_str)
         return image_hash_str.strip()
+
+
+
+    """
+        Stock the hash in the bdd
+    """
+    def stock_image_neural_hash(self,neural_hash) :
+        passwordFile = open("/home/admin/CryptImage/cryptimage/bdd_passwd.txt", mode='r')
+        passwd = str(passwordFile.readline()).strip()
+        mydb = mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password=passwd,
+        database="CryptImage"
+        )
+        neural_hash = neural_hash.strip()
+        mycursor = mydb.cursor()
+        sql = "INSERT INTO hashs (hash) VALUES ('" + neural_hash + "');"
+        mycursor.execute(sql)
+        mydb.commit()
 
