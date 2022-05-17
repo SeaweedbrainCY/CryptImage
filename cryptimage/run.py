@@ -54,8 +54,18 @@ if cmd== "1":
     password = input(">")
 
     from cryptimage.imageToSign import ImageToSign
+    from cryptimage.imageToVerify import ImageToVerify
     print("[*] Signature de l'image ...")
-    image = ImageToSign(path, password)
+    try :
+      ImageToVerify(path, password)
+      valid = False
+    except :
+      valid = True
+
+    if valid: 
+      image = ImageToSign(path, password)
+    else :
+      print("Cette image est déjà protégé ! Impossible de la signée")
 elif cmd=="2":
     print("\n\n\n ##### VÉRIFICATION DE PROPRIÉTÉ D'IMAGE #####")
     print("\n[*] Chemin absolu de l'image ")

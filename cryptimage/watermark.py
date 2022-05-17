@@ -330,9 +330,12 @@ class Watermark(CryptImage) :
         Extract the generated watermark (as an image) from the image
     """
     def extractWatermark(self):
-        (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
-        (bottom_right_x, bottom_right_y) = self.watermarkPosition["bottom_right"]
-        nbPixels = self.watermarkPosition["nbPixels"]
+        try :
+            (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
+            (bottom_right_x, bottom_right_y) = self.watermarkPosition["bottom_right"]
+            nbPixels = self.watermarkPosition["nbPixels"]
+        except: 
+            raise Exception("FATAL ERROR : No watermark")
 
         #print("position = ", self.watermarkPosition)
 
