@@ -3,7 +3,8 @@ from hashlib import sha256
 from ecdsa import SigningKey, VerifyingKey
 from binascii import b2a_base64
 import base64
-import ecies 
+import ecies
+import os
 """
     Perform all cryptography on images and data
 """
@@ -24,7 +25,7 @@ class Cryptography():
         self.imageURL = imageURL
         self.password = password
         self.hash_user_password()
-        
+
 
     """
         Private
@@ -36,7 +37,7 @@ class Cryptography():
 
     """
         Public
-        Generate the unique key (per user) according to the crypto schema 
+        Generate the unique key (per user) according to the crypto schema
     """
     def generate_unique_key(self):
         encrypted_password = self.encrypt(self.hash_user_password)
@@ -52,7 +53,7 @@ class Cryptography():
         clear_data = clear.encode()
         encrypted = ecies.encrypt(public_key_hex, clear_data)
         return (encrypted.hex())
-        
+
 
     """
         Decrypt with the private key
@@ -65,7 +66,7 @@ class Cryptography():
         decrypted = ecies.decrypt(private_key_hex, cipher_data)
         return self.readablize(decrypted)
 
-    
+
 
     """
         Sign with the sys private key
@@ -75,7 +76,7 @@ class Cryptography():
         hexa =  self.sys_private_key.sign(clear.encode())  # Give the signed message in hexadecimal
         return self.hex_to_base64(hexa)
 
-   
+
 
     """
         Verify the digital signature with the sys public key
@@ -90,9 +91,9 @@ class Cryptography():
         except:
             return False
         return True
-        
 
-    
+
+
 
 
     """
@@ -114,12 +115,10 @@ class Cryptography():
         except ValueError:
             return b.hex()
 
+    def hash_image(self) -> str :
+        try :
+            image_hash_str = os.popen("cd /home/admin/; python3 AppleNeuralHash2ONNX/nnhash.py AppleNeuralHash2ONNX/NeuralHash/model.onnx AppleNeuralHash2ONNX/NeuralHash/neuralhash_128x96_seed1.dat " + self.imageURL).read()
+        except :
+            raise Exception("Impossible to calculate the image hash")
+        return image_hash_str.strip()
 
-
-    
-
-
-
-
-
-    

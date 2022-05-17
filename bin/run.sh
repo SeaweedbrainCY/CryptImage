@@ -1,6 +1,6 @@
 # /bin/bash 
 cd ..
-python3 cryptimage/run.py
+python3 /home/admin/CryptImage/cryptimage/run.py
 
 
 exit 0

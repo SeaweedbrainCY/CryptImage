@@ -12,7 +12,7 @@ from PIL import Image,ImageDraw
 from random import randint
 
 
-class Watermark(CryptImage) : 
+class Watermark(CryptImage) :
     watermark_str = "" # The string to embed in the image
     finalImageURL = "" # Final path of the image signed
     watermarkPosition = "" # un dictionnaire de la forme : {'top_left' : (x,y), 'top_right' : (x,y)}
@@ -22,16 +22,16 @@ class Watermark(CryptImage) :
 
     def __init__(self, imageURL, password):
         super().__init__(imageURL, password)
-        
-    
+
+
     """
-        Manage the watermark creation 
+        Manage the watermark creation
         Return True or  raise an exception if fail
     """
     def mainWatermarkSignature(self):
-        self.imageCopy() 
+        self.imageCopy()
         print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
-        
+
         print("[*] Génération de la signature  ...", end=' ')
         self.generateWatermarkString()
         print("Ok")
@@ -49,21 +49,21 @@ class Watermark(CryptImage) :
         print("Ok")
 
         print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
-        self.generateRandomPosition() 
+        self.generateRandomPosition()
         #print("Ok Position : ", self.watermarkPosition)
-        
+
         print("[*] Intégration du motif dans l'image ...", end=' ')
         self.emebedWatermark()
         print("Ok")
-        
+
         return True
 
     """
-        Extraction the watermark creation 
+        Extraction the watermark creation
         Return True or  raise an exception if fail
     """
     def mainWatermarkVerify(self):
-        self.imageCopy() 
+        self.imageCopy()
         print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
 
         print("[*] Extraction des données constituant le motif ... ", end=' ')
@@ -91,10 +91,10 @@ class Watermark(CryptImage) :
 
         return isOk
 
-        
 
 
-   
+
+
 
 
     """
@@ -104,7 +104,7 @@ class Watermark(CryptImage) :
         neuralHash = NeuralHash()
         crypto = Cryptography(self.imageURL, self.password)
 
-        imageHash = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'#neuralHash.neuralHash() for test purpose
+        imageHash = crypto.hash_image()
         hash_password_binary = ''.join(format(ord(x), 'b').zfill(8) for x in crypto.hashed_password) # Encoding over 8 bits per char
         neuralHash_binary = ''.join(format(ord(x), 'b').zfill(8) for x in imageHash) # Encoding over 8 bits per char
         text_to_hash_binary = bin(int(hash_password_binary,2) | int(neuralHash_binary,2))[2:]
@@ -130,15 +130,15 @@ class Watermark(CryptImage) :
 
     """
     Enlever les 3 carrés délimitant le QRcode
-    """    
-    def stripQRCodeCorners(self):  
+    """
+    def stripQRCodeCorners(self):
         qr = Image.open(self.qrcodePath)
-        qr_code = np.array(qr) 
+        qr_code = np.array(qr)
         transparent_area = (0,0,13,13) #carré en haut à gauche
         transparent_area2=(qr_code.shape[0]-14,0,qr_code.shape[0],13) #carré en haut à droite
         transparent_area3=(0,qr_code.shape[0]-14,13,qr_code.shape[0]) #carré en bas à gauche
         mask=Image.new('L', qr.size, color=255)
-        draw=ImageDraw.Draw(mask) 
+        draw=ImageDraw.Draw(mask)
         draw.rectangle(transparent_area, fill=0)
         draw2=ImageDraw.Draw(mask)
         draw2.rectangle(transparent_area2, fill=0)
@@ -183,7 +183,7 @@ class Watermark(CryptImage) :
         self.finalImageURL = splited[0] + "_signed.png"
         im = Image.open(self.imageURL)
         im.save(self.finalImageURL)
-        
+
 
 
     """
@@ -199,11 +199,11 @@ class Watermark(CryptImage) :
                if len(splited) == 1 or len(splited) == 2:
                    self.imageURL = splited[0] + ".png"
                else :
-                   raise Exception("FATAL ERROR : The path to the file isn't correct") 
+                   raise Exception("FATAL ERROR : The path to the file isn't correct")
 
                img.save(self.imageURL)
         except :
-           raise Exception("FATAL ERROR : The file isn't an image") 
+           raise Exception("FATAL ERROR : The file isn't an image")
 
     """
         Generate a random position in the image where the watermark CAN be embedded
@@ -219,24 +219,24 @@ class Watermark(CryptImage) :
         self.watermarkPosition = {"top_left":(x_qr, y_qr), "bottom_right":(x_qr + width , y_qr + len(self.qrCodePixelsBytes)), "nbPixels":len(self.qrCodePixelsBytes)}
 
 
-    """ 
+    """
     Generate the tab associated to a QR code
     """
 
     def generateQrCodeMatrice(self):
         im = Image.open(self.qrcodePath)
         pixels = im.load()
-        width, height = im.size    
+        width, height = im.size
         matrix = []
 
         for x in range(width):
             tmp = []
             for y in range(height):
- 
+
                 (r,g,b, a) = pixels[x,y]
                 if a == 0:
                     tmp.append(-1)
-                    
+
                 elif (r,g,b) == (255,255,255):
                     tmp.append(1)
                 else :
@@ -244,10 +244,10 @@ class Watermark(CryptImage) :
             matrix.append(tmp)
         #print(matrix)
         self.qrCodePixelsBytes = matrix
-        
-        
-        
-        
+
+
+
+
     """
         Embed the generated watermark (as an image) in the image
     """
@@ -255,10 +255,10 @@ class Watermark(CryptImage) :
         (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
         (bottom_right_x, bottom_right_y) = self.watermarkPosition["bottom_right"]
 
-        #import os 
+        #import os
         #print("BEFORE")
         #os.system("md5 test2_signed.png")
-       
+
         im = Image.open(self.finalImageURL)
         pixelMap = im.load()
         x=0
@@ -297,7 +297,7 @@ class Watermark(CryptImage) :
                 else :
                     #print("!!! Y+2 > MATRIX LEN : ", y+2 , ">", matrix_len)
                     new_b = b
-                
+
                 #print("(", i, ",", j, ") : Bin = " , bin(r), "-->", bin(new_r), " ", bin(g), "-->", bin(new_g), " ",bin(b), "-->", bin(new_b))
                 if im.mode == "RGB":
                     pixelMap[i,j] = (new_r, new_g, new_b)
@@ -311,7 +311,7 @@ class Watermark(CryptImage) :
         #os.system("md5 test2_signed.png")
         im = Image.open(self.finalImageURL)
         pixelMap = im.load()
-        
+
         #for i in range(top_left_x, bottom_right_x):
         #    for j in range(top_left_y, bottom_right_y):
         #        (r,g,b) = pixelMap[i,j]
@@ -334,7 +334,7 @@ class Watermark(CryptImage) :
             (top_left_x, top_left_y) = self.watermarkPosition["top_left"]
             (bottom_right_x, bottom_right_y) = self.watermarkPosition["bottom_right"]
             nbPixels = self.watermarkPosition["nbPixels"]
-        except: 
+        except:
             raise Exception("FATAL ERROR : No watermark")
 
         #print("position = ", self.watermarkPosition)
@@ -347,8 +347,8 @@ class Watermark(CryptImage) :
         for i in range(top_left_x, bottom_right_x):
             for j in range(top_left_y, bottom_right_y):
                 if im.mode == "RGB":
-                    (r,g,b) = pixelMap[i,j] 
-                else : 
+                    (r,g,b) = pixelMap[i,j]
+                else :
                     (r,g,b,a) = pixelMap[i,j]
                 #print(i,",", j, ":", bin(r), " ", bin(g), " ", bin(b))
 
@@ -359,9 +359,9 @@ class Watermark(CryptImage) :
         #print(y_lim)
         qrCodeExtracted = [] # [[2]*nbPixels]*nbPixels
         #print(len(qrCodeExtracted))
-        
 
-        
+
+
 
         for y in range(top_left_y, bottom_right_y):
             tmp = []
@@ -390,26 +390,26 @@ class Watermark(CryptImage) :
         #print(len(qrCodeExtracted[0]))
         self.qrCodePixelsBytes = qrCodeExtracted
 
-        
 
 
 
-    
+
+
         """
-            Test if the motif is correct according to the user 
+            Test if the motif is correct according to the user
             Return True is ok, False if not
         """
     def checkWatermark(self):
         neuralHash = NeuralHash()
         crypto = Cryptography(self.imageURL, self.password)
 
-        imageHash = '9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08'#neuralHash.neuralHash() for test purpose
+        imageHash = crypto.hash_image()
         hash_password_binary = ''.join(format(ord(x), 'b').zfill(8) for x in crypto.hashed_password) # Encoding over 8 bits per char
         neuralHash_binary = ''.join(format(ord(x), 'b').zfill(8) for x in imageHash) # Encoding over 8 bits per char
         text_to_hash_binary = bin(int(hash_password_binary,2) | int(neuralHash_binary,2))[2:]
         text_to_hash_hexa = hex(int(text_to_hash_binary, 2))
         hashed_text = sha256(text_to_hash_hexa[2:].encode()).hexdigest()
-            
+
         splited = self.watermark_str.split(',')
         if len(splited) != 2:
             print("\n\n[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner\n\n")
@@ -418,22 +418,22 @@ class Watermark(CryptImage) :
         extractedHash = splited[0]
         extractedSignature = splited[1]
 
-            # First step : Verify the signature 
+            # First step : Verify the signature
         if not crypto.verify_signature(extractedSignature, extractedHash):
             print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
-            return False 
+            return False
         else :
             print("[*] Signature verified")
         #print(extractedHash)
         #print(hashed_text)
         if extractedHash == hashed_text :
-            return True 
-        else : 
+            return True
+        else :
             print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
             return False
-            
 
-            
+
+
     """
     Reconstruit le qr code à partir de la matrice
     """
@@ -465,7 +465,7 @@ class Watermark(CryptImage) :
         qrcode.save(self.qrcodePath)
         self.stripQRCodeCorners()
 
-    
+
     """
         Add border to a qr code
     """
@@ -480,15 +480,15 @@ class Watermark(CryptImage) :
             for y in  range(4,width-4):
                 newPixels[x,y] = old_pixels[i,j]
                 j+=1
-            i+=1 
+            i+=1
             j=0
         qrcode.save(self.qrcodePath)
 
-        
+
 
 
     """
-    Read the qr code data 
+    Read the qr code data
     """
     def readQRcode(self):
         #print(self.qrcodePath)
@@ -506,9 +506,9 @@ class Watermark(CryptImage) :
 
 
 
-        
 
 
-        
+
+
 
 
