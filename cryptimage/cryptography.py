@@ -6,6 +6,8 @@ import base64
 import ecies
 import os
 import mysql.connector
+from difflib import SequenceMatcher
+
 """
     Perform all cryptography on images and data
 """
@@ -127,15 +129,15 @@ class Cryptography():
         except :
             raise Exception("Impossible to calculate the image hash")
 
-        self.stock_image_neural_hash(image_hash_str)
         return image_hash_str.strip()
 
 
 
     """
-        Stock the hash in the bdd
+        Stock the hash in the bdd after the signature
     """
-    def stock_image_neural_hash(self,neural_hash) :
+    def stock_image_neural_hash(self) :
+        neural_hash = self.hash_image()
         passwordFile = open("/home/admin/CryptImage/cryptimage/bdd_passwd.txt", mode='r')
         passwd = str(passwordFile.readline()).strip()
         mydb = mysql.connector.connect(
@@ -149,4 +151,35 @@ class Cryptography():
         sql = "INSERT INTO hashs (hash) VALUES ('" + neural_hash + "');"
         mycursor.execute(sql)
         mydb.commit()
+
+
+    """
+        retrieve hash in the bdd and calculate the correlation rate
+    """
+
+
+    def checkHashStorage(self)  :
+         neural_hash = self.hash_image()
+         passwordFile = open("/home/admin/CryptImage/cryptimage/bdd_passwd.txt", mode='r')
+         passwd = str(passwordFile.readline()).strip()
+         mydb = mysql.connector.connect(
+         host="localhost",
+         user="root",
+         password=passwd,
+         database="CryptImage"
+         )
+         neural_hash = neural_hash.strip()
+         mycursor = mydb.cursor()
+         sql = "SELECT * from hashs"
+         mycursor.execute(sql)
+         hashs = mycursor.fetchall()
+         for h in hashs :
+             _,h = h
+             if self.similar(h, neural_hash) >=0.7:
+                 return True
+         return False
+
+
+    def similar(self,a, b):
+        return SequenceMatcher(None, a, b).ratio()
 
