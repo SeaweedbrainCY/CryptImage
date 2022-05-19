@@ -16,14 +16,18 @@ class ImageToSign(Cryptography, LSB):
         self.main()
 
     def main(self):
-        if self.mainWatermarkSignature() :
-            if  self.mainLSBSignature() :
-                name = self.imageURL.split('.')
-                print("[*] Votre image a été protégée avec succès ! L'image signée est : " , name[0] , "_signed." , name[1])
-            
+        crypto = Cryptography(self.imageURL, self.password)
+        neural_hash = crypto.hash_image()
+        if not crypto.checkHashStorage() :
+            if self.mainWatermarkSignature() :
+                if  self.mainLSBSignature() :
+                    name = self.imageURL.split('.')
+                    print("[*] Votre image a été protégée avec succès ! L'image signée est : " , str(name[0]) + "_signed." + str(name[1]))
+
+            else :
+                raise Exception("FATAL ERROR : An error occured with generating the watermark")
         else :
-            raise Exception("FATAL ERROR : An error occured with generating the watermark")
-        
+            raise Exception("FORBIDDEN : This image is already protected. You cannot sign a proteted image")
 
 
 
