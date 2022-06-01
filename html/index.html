@@ -7,37 +7,47 @@
         <h1>
             CryptImage
         </h1>
+        <form  name="searchForm" method="post" target=_self enctype="multipart/form-data" action="http://cryptimage.h.minet.net/api/sign">
         <div id="Uploadcontainer">
         <button class="boutonUpload" type="button">
-            <input type="file" id="actual-btn"/>
+            <input type="file" id="actual-btn" name="image"/>
             Upload
         </button>
         </div>
-        
+        <div id="mdp">
+                <label for="mdp" style="color :white">Veuillez saisir votre mot de passe :</label>
+                <input type="password" id="mdp" name="password" required minlength="1" size="10" placeholder="Mot de passe">
+        </div>
+        <input type="submit">
+        </form>
         <div id="buttonContainer">
             <div>
-            <button class="boutonProtect" type="button">
+                <a href="JavaScript:form('http://cryptimage.h.minet.net/api/sign')"><button class="boutonProtect" type="button">
                 <input type="image" src="cadenas.png" width="60px" >
                 Protect
-            </button>
+                    </button></a>
             </div>
             <div>
-            <button class="boutonVerify" type="button">
+                <a href="JavaScript:form('http://cryptimage.h.minet.net/api/verify')"> <button class="boutonVerify" type="button" >
                 <input type="image" src="loupe.png" width="60px" >
                 Verify
-            </button>
+                    </button></a>
             </div>
         </div>
         
-        <div id="mdp">
-        <label for="mdp" style="color :white">Veuillez saisir votre mot de passe :</label>
-        <input type="text" id="mdp" name="mdp" required
-        minlength="1" size="10" placeholder="Mot de passe">
-        </div>
-
         <p>
             Conçu par Nathan Stchepinsky, Thomas Perel, Fabio Gadegbeku et Victorine Cassé<br>
             Pro 3600 2022
         </p>
     </section>
 </body>
+
+
+<script>
+function form(linkUrl)
+    {
+              document.searchForm.action = linkUrl;
+              document.searchForm.submit();
+            
+        }
+</script>
