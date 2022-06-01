@@ -15,8 +15,8 @@ class ImageToVerify(Cryptography, LSB):
     def main(self):
         self.mainLSBVerify()
         if self.mainWatermarkVerify() :
-            print("[*]\n[*] Verification de propriété valide")
+            print("[*]\n[*] SUCCESS : Verification de propriété valide")
             return True
         else:
-            print("[*]\n[*] Verification de propriété invalide. UTILISATION DE L'IMAGE INTERDITE")
+            print("[*]\n[*]FORBIDDEN :  Verification de propriété invalide. UTILISATION DE L'IMAGE INTERDITE")
             return False

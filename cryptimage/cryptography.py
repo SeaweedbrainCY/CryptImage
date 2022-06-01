@@ -64,7 +64,7 @@ class Cryptography():
     """
     def sys_decrypt(self, cipher):
         private_key_hex = "0x" + self.sys_private_key.to_string().hex()
-        print("priv= " , private_key_hex)
+        #print("priv= " , private_key_hex)
         cipher_data = bytes.fromhex(cipher)
         decrypted = ecies.decrypt(private_key_hex, cipher_data)
         return self.readablize(decrypted)

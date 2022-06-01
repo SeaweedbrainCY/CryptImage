@@ -19,28 +19,28 @@ class LSB(Watermark):
         Return True or  raise an exception if fail
     """
     def mainLSBSignature(self):
-        print("[*] Génération des données cachées ...", end=' ')
+        #print("[*] Génération des données cachées ...", end=' ')
         self.generateLSBstring()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Intégration des données cachées dans l'image ...", end=' ')
+        #print("[*] Intégration des données cachées dans l'image ...", end=' ')
         self.embedInLSB()
 
 
-        print("[*] Stockage du haché neuronnal dans la base de donnée ...", end=' ')
+        #print("[*] Stockage du haché neuronnal dans la base de donnée ...", end=' ')
         crypto = Cryptography(self.imageURL, self.password)
         crypto.stock_image_neural_hash()
-        print("Ok")
+        #print("Ok")
         return True
 
     def mainLSBVerify(self):
-        print("[*] Extraction des données cachées dans l'image ...",  end=' ')
+        #print("[*] Extraction des données cachées dans l'image ...",  end=' ')
         self.decodeLSB()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Déchiffrement des données cachées ...",  end=' ')
+        #print("[*] Déchiffrement des données cachées ...",  end=' ')
         self.decryptLSBString()
-        print("Ok. Déchiffré : ", self.watermarkPosition )
+        #print("Ok. Déchiffré : ", self.watermarkPosition )
 
     """
         Genere le message chiffre a integrer dans les LSB
@@ -107,8 +107,10 @@ class LSB(Watermark):
         #print(self.lsb_str)
         for i in range(0, len(bin_lsb_str), 3):
             #print(x)
-            if x> width: # on a atteint le bout de la ligne, on passe à la ligne suivante
+            if x>= width: # on a atteint le bout de la ligne, on passe à la ligne suivante
                 y += 1
+                if y >= height :
+                    raise Exception("Not enough place to embed LSB")
                 x=0
             if im.mode == "RGB":
                 r,g,b=pixels[x,y]
