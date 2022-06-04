@@ -30,31 +30,31 @@ class Watermark(CryptImage) :
     """
     def mainWatermarkSignature(self):
         self.imageCopy()
-        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+        #print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
 
-        print("[*] Génération de la signature  ...", end=' ')
+        #print("[*] Génération de la signature  ...", end=' ')
         self.generateWatermarkString()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Génération du motif ...", end=' ')
+        #print("[*] Génération du motif ...", end=' ')
         self.generateWatermarkImage()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Préparation du motif  ...", end=' ')
+        #print("[*] Préparation du motif  ...", end=' ')
         self.stripQRCodeCorners()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Préparation des données du motif ...", end=' ')
+        #print("[*] Préparation des données du motif ...", end=' ')
         self.generateQrCodeMatrice()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
+        #print("[*] Génération aléatoire d'une position dans l'image ...", end=' ')
         self.generateRandomPosition()
         #print("Ok Position : ", self.watermarkPosition)
 
-        print("[*] Intégration du motif dans l'image ...", end=' ')
+        #print("[*] Intégration du motif dans l'image ...", end=' ')
         self.emebedWatermark()
-        print("Ok")
+        #print("Ok")
 
         return True
 
@@ -64,29 +64,29 @@ class Watermark(CryptImage) :
     """
     def mainWatermarkVerify(self):
         self.imageCopy()
-        print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
+        #print("[*] Creation de la nouvelle image nommée " + self.finalImageURL)
 
-        print("[*] Extraction des données constituant le motif ... ", end=' ')
+        #print("[*] Extraction des données constituant le motif ... ", end=' ')
         self.extractWatermark()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Reconstruction du motif 1/3 ... ", end=' ')
+        #print("[*] Reconstruction du motif 1/3 ... ", end=' ')
         self.reconstructQRCode()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Reconstruction du motif 2/3 ... ", end=' ')
+        #print("[*] Reconstruction du motif 2/3 ... ", end=' ')
         self.refaire_3_blocs()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Reconstruction du motif 3/3 ... ", end=' ')
+        #print("[*] Reconstruction du motif 3/3 ... ", end=' ')
         self.addBorder()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Extraction des données cotenus dans le motif ...", end=' ')
+        #print("[*] Extraction des données cotenus dans le motif ...", end=' ')
         self.readQRcode()
-        print("Ok")
+        #print("Ok")
 
-        print("[*] Verification de la preuve de propriété ...")
+        #print("[*] Verification de la preuve de propriété ...")
         isOk =  self.checkWatermark()
 
         return isOk
@@ -412,7 +412,7 @@ class Watermark(CryptImage) :
 
         splited = self.watermark_str.split(',')
         if len(splited) != 2:
-            print("\n\n[!] REQUEST REJECTED [!]\n You are NOT the rightfull owner\n\n")
+            print("\n\n[!]FORBIDDEN :  REQUEST REJECTED [!]\n You are NOT the rightfull owner\n\n")
             return False
 
         extractedHash = splited[0]
@@ -420,16 +420,16 @@ class Watermark(CryptImage) :
 
             # First step : Verify the signature
         if not crypto.verify_signature(extractedSignature, extractedHash):
-            print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
+            print("[!]FORBIDDEN : REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
             return False
         else :
-            print("[*] Signature verified")
+            print("[*] SUCCESS : Signature verified")
         #print(extractedHash)
         #print(hashed_text)
         if extractedHash == hashed_text :
             return True
         else :
-            print("[!] REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
+            print("[!] FORBIDDEN : REQUEST REJECTED \n[!] You are NOT the rightfull owner ")
             return False
 
 
