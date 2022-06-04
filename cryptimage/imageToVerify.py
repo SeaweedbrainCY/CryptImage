@@ -13,8 +13,19 @@ class ImageToVerify(Cryptography, LSB):
 
 
     def main(self):
-        self.mainLSBVerify()
-        if self.mainWatermarkVerify() :
+        try :
+            self.mainLSBVerify()
+            lsb = True
+        except :
+            lsb = False
+        try :
+            watermark = self.mainWatermarkVerify()
+        except :
+            watermark = False
+
+
+
+        if lsb == watermark:
             print("[*]\n[*] SUCCESS : Verification de propriété valide")
             return True
         else:

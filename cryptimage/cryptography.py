@@ -88,8 +88,8 @@ class Cryptography():
     """
     def verify_signature(self, signature, message):
         encodedMessage = message.encode()
-        signatureData = self.base64_to_hex(signature)
         try :
+            signatureData = self.base64_to_hex(signature)
             self.sys_public_key.verify(signatureData,encodedMessage)
         except:
             return False

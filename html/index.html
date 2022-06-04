@@ -7,18 +7,18 @@
         <h1>
             CryptImage
         </h1>
-        <form  name="searchForm" method="post" target=_self enctype="multipart/form-data" action="http://cryptimage.h.minet.net/api/sign">
         <div id="Uploadcontainer">
-        <button class="boutonUpload" type="button">
-            <input type="file" id="actual-btn" name="image"/>
-            Upload
+        <form name="searchForm" method="post" target=_self enctype="multipart/form-data" action="http://cryptimage.h.minet.net/api/sign">
+        <button class="boutonUpload" style="padding:20px 20px; display:flex; justify-content:center;" type="button">
+
+            <div><input type="file" id="actual-btn" name="image"/></div>
+            
         </button>
         </div>
         <div id="mdp">
                 <label for="mdp" style="color :white">Veuillez saisir votre mot de passe :</label>
                 <input type="password" id="mdp" name="password" required minlength="1" size="10" placeholder="Mot de passe">
         </div>
-        <input type="submit">
         </form>
         <div id="buttonContainer">
             <div>

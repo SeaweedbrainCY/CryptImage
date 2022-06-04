@@ -22,10 +22,11 @@ def sign():
 
         try :
             f = request.files['image']
-            f.save('/var/www/html/image.png')
+            extension = f.filename.split('.')[-1]
+            f.save('/var/www/html/image.' + extension)
         except :
             return "Error. Impossible to retrieve the image."
-        rep = os.popen("cd /home/admin/CryptImage; export PYTHONPATH=/home/admin/CryptImage; bin/./run.sh 1  /var/www/html/image.png " + password ).read()
+        rep = os.popen("cd /home/admin/CryptImage; export PYTHONPATH=/home/admin/CryptImage; bin/./run.sh 1  /var/www/html/image." +extension + " " + password ).read()
         print(rep)
         if 'FAIL' in rep or "FATAL" in rep or "ERROR" in rep or "error" in rep or "fail" in rep or "FORBID" in rep or "forbid" in rep :
             return redirect("http://cryptimage.h.minet.net/forbidden.html", code=302)
@@ -33,8 +34,38 @@ def sign():
             try :
                 return send_file('/var/www/html/image_signed.png', attachment_filename="image_signed.png")
             except:
-                return "<p> Your image has been protected but impossible to send it. Please download it <a href='http://cryptimage.h.minet.net/image_protected.png'>here</a></p>"
+                return "<p> Your image has been protected but impossible to send it. Please download it <a href='http://cryptimage.h.minet.net/image_signed.png'>here</a></p>"
         else :
             return redirect("http://cryptimage.h.minet.net/forbidden.html", code=302)
     else :
         return "<p>Please use POST request</p>"
+
+@app.route("/verify", methods=['GET', 'POST'])
+def verify():
+     import os
+     print(os.getcwd())
+     if request.method == 'POST':
+         try :
+             password = request.form['password']
+         except  :
+             return "Error. Impossible to retrieve the password."
+
+         try :
+             f = request.files['image']
+             extension = f.filename.split('.')[-1]
+             f.save('/var/www/html/image.' + extension)
+         except :
+             return "Error. Impossible to retrieve the image."
+         rep = os.popen("cd /home/admin/CryptImage; export PYTHONPATH=/home/admin/CryptImage; bin/./run.sh 2  /var/www/html/image." +extension + " " + password ).read()
+         print(rep)
+         if 'FAIL' in rep or "FATAL" in rep or "ERROR" in rep or "error" in rep or "fail" in rep or "FORBID" in rep or "forbid" in rep :
+             return redirect("http://cryptimage.h.minet.net/forbidden.html", code=302)
+         elif "SUCCESS" in rep or "success" in rep:
+             return redirect("http://cryptimage.h.minet.net/success.html", code=302)
+         else :
+             return redirect("http://cryptimage.h.minet.net/forbidden.html", code=302)
+     else :
+         return "<p>Please use POST request</p>"
+
+
+

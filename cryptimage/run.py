@@ -58,15 +58,17 @@ if cmd== "1":
     from cryptimage.imageToVerify import ImageToVerify
     #print("[*] Signature de l'image ...")
     try :
-      ImageToVerify(path, password)
-      valid = False
+      valid = ImageToVerify(path, password)
     except :
       valid = True
 
     if valid:
-      image = ImageToSign(path, password)
+        try :
+            image = ImageToSign(path, password)
+        except :
+            print("FORBIDDEN : it's illegal")
     else :
-      print("FAIL : ")
+      print("FORBIDDEN : ")
       print("Cette image est déjà protégé ! Impossible de la signée")
 elif cmd=="2":
     #print("\n\n\n ##### VÉRIFICATION DE PROPRIÉTÉ D'IMAGE #####")
