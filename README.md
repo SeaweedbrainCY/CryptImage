@@ -1,15 +1,15 @@
 # CryptImage
 CryptImage (this name in temporary) is the repository of a python program able to watermark an image in order to protect it against theft and spoofing
 
-## Installation 
+## Installation guide
 
- 1 - Cloner le git 
+ 1 - Clone this repository
  
- 2 - Executer `./install.sh` dans le dossier `bin`
+ 2 - Run `./install.sh` in the directory `bin`
  
- 3 - Exporter le `PYTHONPATH` avec le chemin **absolu** du dossier `CryptImage`
+ 3 - Export the `PYTHONPATH` with the **absolute** path of the `CryptImage` directory
  
- 4 - Executer `./run.sh` pour lancer l'algorithme
+ 4 - Run `./run.sh` to run the algorithm
 
 ## Contribution 
 
