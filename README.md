@@ -23,7 +23,7 @@ All features must and will be developed and pushed via the developement branch
 ### Contributors
   - Victorine Cassé 
   - Fabio Gadegbeku
-  - Thomas Perel ([@Thomas](https://github.com/ZorDev0))
+  - Thomas Perel ([@Thomas](https://github.com/ThomasPrl))
   - Nathan Stchepinsky ([@DevNathan](https://github.com/devNathan))
 
 ## Licence 
